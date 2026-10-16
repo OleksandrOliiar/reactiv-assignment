@@ -13,6 +13,8 @@ export const configurationIdParamsSchema = z.object({
   id: entityIdSchema,
 });
 
+export type ConfigurationIdParams = z.infer<typeof configurationIdParamsSchema>;
+
 export function createConfigurationsRoutes(controller: ConfigurationsController) {
   const router = Router();
 

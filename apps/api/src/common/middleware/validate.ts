@@ -31,6 +31,18 @@ export function validate(schemas: RequestSchemas) {
   };
 }
 
+/** Reads the body and params already parsed by `validate()`. */
+export function readValidated<TParams, TBody>(req: Request): { params: TParams; body: TBody } {
+  if (!req.validated) {
+    throw new Error('validate() must run before the controller reads the request');
+  }
+
+  return {
+    params: req.validated.params as TParams,
+    body: req.validated.body as TBody,
+  };
+}
+
 function prefixDetails(
   prefix: string,
   details: { path: string; message: string }[],

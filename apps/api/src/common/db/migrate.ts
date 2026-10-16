@@ -5,7 +5,10 @@ import { migrate } from 'drizzle-orm/node-postgres/migrator';
 
 import type { Database } from './client';
 
-const migrationsFolder = resolve(dirname(fileURLToPath(import.meta.url)), '../../../drizzle');
+export const migrationsFolder = resolve(
+  dirname(fileURLToPath(import.meta.url)),
+  '../../../drizzle',
+);
 
 export async function runMigrations(db: Database): Promise<void> {
   await migrate(db, { migrationsFolder });

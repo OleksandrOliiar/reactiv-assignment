@@ -4,6 +4,8 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "dev": "tsx watch src/server.ts",
+    "start": "tsx src/server.ts",
     "typecheck": "tsc --noEmit -p tsconfig.json",
     "test": "vitest run --config vitest.config.ts",
     "db:generate": "drizzle-kit generate",
@@ -17,6 +19,7 @@
     "@scalar/express-api-reference": "^0.10.30",
     "drizzle-orm": "^0.45.4",
     "express": "^5.3.0",
+    "helmet": "^8.3.0",
     "pg": "^8.23.1",
     "pino": "^10.4.0",
     "pino-http": "^11.0.0",

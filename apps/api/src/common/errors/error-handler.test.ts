@@ -62,6 +62,18 @@ describe('error handler', () => {
     });
   });
 
+  it('returns 400 for malformed JSON', async () => {
+    const response = await request(app)
+      .post('/widgets')
+      .set('Content-Type', 'application/json')
+      .send('{');
+    expect(response.status).toBe(400);
+    expect(errorResponseSchema.parse(response.body).error).toMatchObject({
+      code: 'VALIDATION_ERROR',
+      message: 'Invalid JSON',
+    });
+  });
+
   it('hides unexpected errors and unknown routes', async () => {
     const boom = await request(app).get('/boom');
     expect(boom.status).toBe(500);

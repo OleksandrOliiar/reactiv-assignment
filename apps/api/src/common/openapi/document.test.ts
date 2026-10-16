@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
+import '../../modules/configurations/configurations.openapi';
 import { createOpenApiDocument } from './document';
 
 describe('createOpenApiDocument', () => {
@@ -15,6 +16,10 @@ describe('createOpenApiDocument', () => {
     });
     expect(document.components?.securitySchemes).toMatchObject({
       apiKey: { type: 'apiKey', in: 'header', name: 'x-api-key' },
+    });
+    expect(document.paths).toMatchObject({
+      '/v1/configurations/{id}': { get: expect.any(Object), put: expect.any(Object) },
+      '/v1/configurations': { post: expect.any(Object) },
     });
   });
 });

@@ -25,9 +25,24 @@ export function createErrorHandler(logger: Logger): ErrorRequestHandler {
       return;
     }
 
+    if (isJsonParseError(error)) {
+      res.status(400).json(errorBody('VALIDATION_ERROR', 'Invalid JSON'));
+      return;
+    }
+
     logger.error({ err: error, requestId }, 'Unhandled error');
     res.status(500).json(errorBody('INTERNAL', 'Internal server error'));
   };
+}
+
+function isJsonParseError(error: unknown): error is SyntaxError {
+  return (
+    error instanceof SyntaxError &&
+    'status' in error &&
+    error.status === 400 &&
+    'type' in error &&
+    error.type === 'entity.parse.failed'
+  );
 }
 
 function errorBody(

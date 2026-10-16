@@ -1,0 +1,14 @@
+node_modules
+dist
+build
+coverage
+.react-router
+.env
+.env.*
+!.env.example
+*.log
+.DS_Store
+*.tsbuildinfo
+.vite
+playwright-report
+test-results

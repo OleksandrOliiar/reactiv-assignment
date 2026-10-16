@@ -1,0 +1,7 @@
+dist
+build
+coverage
+node_modules
+.react-router
+pnpm-lock.yaml
+drizzle

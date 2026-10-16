@@ -2,7 +2,13 @@ packages:
   - apps/*
   - packages/*
 
+allowBuilds:
+  esbuild: true
+
 minimumReleaseAgeExclude:
   - eslint@10.13.0
-
-onlyBuiltDependencies: []
+  - '@scalar/client-side-rendering@0.4.12'
+  - '@scalar/express-api-reference@0.10.30'
+  - '@scalar/helpers@0.16.4'
+  - '@scalar/schemas@0.14.0'
+  - '@scalar/types@0.24.0'

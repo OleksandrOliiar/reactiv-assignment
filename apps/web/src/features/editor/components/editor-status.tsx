@@ -1,5 +1,5 @@
 import { Badge } from '@/shared/ui/badge';
-import { useEditorStore, useIsDirty, useValidation } from './editor-store-provider';
+import { useEditorStore, useEditorIsDirty, useEditorValidation } from './editor-store-provider';
 
 function statusLabel(isNew: boolean, dirty: boolean): string {
   if (dirty) return 'Unsaved changes';
@@ -10,8 +10,8 @@ function statusLabel(isNew: boolean, dirty: boolean): string {
 export function EditorStatus() {
   const version = useEditorStore((store) => store.state.version);
   const isNew = useEditorStore((store) => store.state.isNew);
-  const dirty = useIsDirty();
-  const errors = useValidation();
+  const dirty = useEditorIsDirty();
+  const errors = useEditorValidation();
   const errorCount = Object.values(errors).reduce(
     (count, fields) => count + Object.keys(fields).length,
     0,

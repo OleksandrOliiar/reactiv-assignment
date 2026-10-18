@@ -1,8 +1,8 @@
-import { Card, CardContent, CardHeader, CardTitle } from '@/shared/ui/card';
-import { UrlField } from './fields';
-import { Button } from '@/shared/ui/button';
 import { ChevronDown, ChevronUp, Trash2 } from 'lucide-react';
-import { useEditorStore } from './editor-store-provider';
+import { Card, CardContent, CardHeader, CardTitle } from '@/shared/ui/card';
+import { Button } from '@/shared/ui/button';
+import { UrlField } from './fields';
+import { useEditorActions } from './editor-store-provider';
 import { DraftImage, SectionErrors } from '../types/types';
 
 export function ImageCard({
@@ -18,9 +18,7 @@ export function ImageCard({
   errors: SectionErrors;
   isLastImage: boolean;
 }) {
-  const removeImage = useEditorStore((store) => store.actions.removeImage);
-  const moveImage = useEditorStore((store) => store.actions.moveImage);
-  const updateImage = useEditorStore((store) => store.actions.updateImage);
+  const { moveImage, removeImage, updateImage } = useEditorActions();
 
   return (
     <Card>

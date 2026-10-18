@@ -2,7 +2,7 @@
 
 import { Button } from '@/shared/ui/button';
 import { Plus } from 'lucide-react';
-import { useEditorStore } from './editor-store-provider';
+import { useEditorActions } from './editor-store-provider';
 import { LIMITS } from '@reactiv/contracts';
 
 export function AddImageButton({
@@ -12,7 +12,7 @@ export function AddImageButton({
   sectionId: string;
   sectionImagesLength: number;
 }) {
-  const addImage = useEditorStore((store) => store.actions.addImage);
+  const { addImage } = useEditorActions();
 
   const atImageLimit = sectionImagesLength >= LIMITS.imagesPerCarousel;
 

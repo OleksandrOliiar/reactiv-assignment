@@ -5,11 +5,11 @@ import { Smartphone } from 'lucide-react';
 import { Card, CardContent } from '@/shared/ui/card';
 import { Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from '@/shared/ui/empty';
 import { ScrollArea } from '@/shared/ui/scroll-area';
-import { useEditorStore } from '../components/editor-store-provider';
+import { useEditorSections } from '../components/editor-store-provider';
 import { SectionPreview } from './sections-registry';
 
 export function PhonePreview() {
-  const sections = useEditorStore((store) => store.state.document.sections);
+  const sections = useEditorSections();
 
   return (
     <Card

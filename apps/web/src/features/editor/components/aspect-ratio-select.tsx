@@ -2,7 +2,7 @@
 
 import { ASPECT_RATIOS, AspectRatio } from '@reactiv/contracts';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/shared/ui/select';
-import { useEditorStore } from './editor-store-provider';
+import { useEditorActions } from './editor-store-provider';
 import { SectionErrors } from '../types/types';
 
 const ASPECT_LABELS: Record<AspectRatio, string> = {
@@ -20,7 +20,7 @@ export function AspectRatioSelect({
   currentValue: AspectRatio;
   errors: SectionErrors;
 }) {
-  const updateSection = useEditorStore((store) => store.actions.updateSection);
+  const { updateSection } = useEditorActions();
 
   function handleAspectRatioChange(value: string) {
     updateSection(sectionId, (current) =>

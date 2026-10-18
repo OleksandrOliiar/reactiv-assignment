@@ -1,7 +1,7 @@
 'use client';
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/shared/ui/tabs';
-import { useIsDirty } from './editor-store-provider';
+import { useEditorIsDirty } from './editor-store-provider';
 import { EditorToolbar } from './editor-toolbar';
 import { PhonePreview } from './phone-preview';
 import { SectionList } from './section-list';
@@ -12,7 +12,7 @@ import { useUnsavedChangesWarning } from '../hooks/use-unsaved-changes-warning';
  * the tab list hides and the panes sit side by side.
  */
 export function EditorScreen() {
-  useUnsavedChangesWarning(useIsDirty());
+  useUnsavedChangesWarning(useEditorIsDirty());
 
   return (
     <main className="mx-auto flex w-full max-w-6xl flex-col gap-6 px-4 py-6 sm:px-6 lg:py-10">

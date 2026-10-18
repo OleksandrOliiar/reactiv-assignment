@@ -37,7 +37,7 @@ import {
 } from '@/shared/ui/dropdown-menu';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/shared/ui/tooltip';
 
-import { useEditorStore } from './editor-store-provider';
+import { useEditorActions, useEditorSelectedSectionId } from './editor-store-provider';
 import { sectionTitle } from '../utils/utils';
 import { DraftSection } from '../types/types';
 import { SectionEditor, sectionRegistry } from './sections-registry';
@@ -51,11 +51,8 @@ type SectionCardProps = {
 };
 
 export function SectionCard({ section, index, count, errors }: SectionCardProps) {
-  const selected = useEditorStore((store) => store.state.selectedSectionId === section.id);
-  const selectSection = useEditorStore((store) => store.actions.selectSection);
-  const moveSection = useEditorStore((store) => store.actions.moveSection);
-  const duplicateSection = useEditorStore((store) => store.actions.duplicateSection);
-  const removeSection = useEditorStore((store) => store.actions.removeSection);
+  const selected = useEditorSelectedSectionId() === section.id;
+  const { moveSection, duplicateSection, removeSection, selectSection } = useEditorActions();
   const [confirmingDelete, setConfirmingDelete] = useState(false);
   const {
     attributes,

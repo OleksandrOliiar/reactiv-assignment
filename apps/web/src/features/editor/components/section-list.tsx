@@ -24,7 +24,12 @@ import {
 
 import { AddSectionMenu } from '../components/add-section-menu';
 import { sectionTitle } from '../utils/utils';
-import { useEditorStore, useValidation } from '../components/editor-store-provider';
+import {
+  useEditorActions,
+  useEditorSections,
+  useEditorStore,
+  useEditorValidation,
+} from '../components/editor-store-provider';
 import { SectionCard } from '../components/section-card';
 
 const SCREEN_READER_INSTRUCTIONS =
@@ -35,9 +40,9 @@ const SCREEN_READER_INSTRUCTIONS =
  * the store, because dnd-kit keyboard dragging skips over tall expanded cards.
  */
 export function SectionList() {
-  const sections = useEditorStore((store) => store.state.document.sections);
-  const reorderSection = useEditorStore((store) => store.actions.reorderSection);
-  const errors = useValidation();
+  const sections = useEditorSections();
+  const { reorderSection } = useEditorActions();
+  const errors = useEditorValidation();
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 4 } }));
 
   function titleOf(id: UniqueIdentifier | undefined): string {
@@ -61,22 +66,7 @@ export function SectionList() {
   }
 
   if (sections.length === 0) {
-    return (
-      <Empty className="border">
-        <EmptyHeader>
-          <EmptyMedia variant="icon">
-            <LayoutList />
-          </EmptyMedia>
-          <EmptyTitle>No sections yet</EmptyTitle>
-          <EmptyDescription>
-            Add a carousel, text block, or button to build the screen.
-          </EmptyDescription>
-        </EmptyHeader>
-        <EmptyContent>
-          <AddSectionMenu />
-        </EmptyContent>
-      </Empty>
-    );
+    return <NoSectionsMessage />;
   }
 
   return (
@@ -107,5 +97,24 @@ export function SectionList() {
         </div>
       </SortableContext>
     </DndContext>
+  );
+}
+
+function NoSectionsMessage() {
+  return (
+    <Empty className="border">
+      <EmptyHeader>
+        <EmptyMedia variant="icon">
+          <LayoutList />
+        </EmptyMedia>
+        <EmptyTitle>No sections yet</EmptyTitle>
+        <EmptyDescription>
+          Add a carousel, text block, or button to build the screen.
+        </EmptyDescription>
+      </EmptyHeader>
+      <EmptyContent>
+        <AddSectionMenu />
+      </EmptyContent>
+    </Empty>
   );
 }

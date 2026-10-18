@@ -10,11 +10,11 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/shared/ui/dropdown-menu';
-import { useEditorStore } from './editor-store-provider';
+import { useEditorActions, useEditorStore } from './editor-store-provider';
 import { sectionRegistry } from './sections-registry';
 
 export function AddSectionMenu() {
-  const addSection = useEditorStore((state) => state.actions.addSection);
+  const { addSection } = useEditorActions();
   const atLimit = useEditorStore(
     (state) => state.state.document.sections.length >= LIMITS.sections,
   );

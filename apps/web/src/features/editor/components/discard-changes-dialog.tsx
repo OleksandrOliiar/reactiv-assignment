@@ -11,12 +11,12 @@ import {
 } from '@/shared/ui/alert-dialog';
 import { Button } from '@/shared/ui/button';
 import { Undo2 } from 'lucide-react';
-import { useEditorStore, useIsDirty } from './editor-store-provider';
+import { useEditorActions, useEditorIsDirty } from './editor-store-provider';
 
 export function DiscardChangesDialog() {
-  const dirty = useIsDirty();
-  const discardChanges = useEditorStore((store) => store.actions.discardChanges);
-  
+  const dirty = useEditorIsDirty();
+  const { discardChanges } = useEditorActions();
+
   return (
     <AlertDialog>
       <AlertDialogTrigger asChild>

@@ -1,12 +1,22 @@
-import type { Section } from '@reactiv/contracts';
+'use client';
 
+import { useEditorStore, useIsDirty, useValidation } from '@/features/editor/editor-store-provider';
+import type { DraftSection } from '@/features/editor/draft';
 import { Badge } from '@/shared/ui/badge';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/shared/ui/card';
 import { Field, FieldDescription, FieldGroup, FieldLabel } from '@/shared/ui/field';
-import type { LoadedConfiguration } from '@/features/configuration/types';
 
-export function HomeScreenSummary({ loaded }: { loaded: LoadedConfiguration }) {
-  const { configuration, isNew } = loaded;
+export function EditorScreen() {
+  const id = useEditorStore((state) => state.id);
+  const version = useEditorStore((state) => state.version);
+  const isNew = useEditorStore((state) => state.isNew);
+  const sections = useEditorStore((state) => state.document.sections);
+  const dirty = useIsDirty();
+  const errors = useValidation();
+  const errorCount = Object.values(errors).reduce(
+    (count, fields) => count + Object.keys(fields).length,
+    0,
+  );
 
   return (
     <FieldGroup className="mx-auto w-full max-w-3xl px-6 py-10">
@@ -19,23 +29,24 @@ export function HomeScreenSummary({ loaded }: { loaded: LoadedConfiguration }) {
           <FieldGroup>
             <Field>
               <FieldLabel>Id</FieldLabel>
-              <FieldDescription>{configuration.id}</FieldDescription>
+              <FieldDescription>{id}</FieldDescription>
             </Field>
             <Field>
               <FieldLabel>Version</FieldLabel>
-              <FieldDescription>{configuration.version}</FieldDescription>
+              <FieldDescription>{version}</FieldDescription>
             </Field>
             <Field>
               <FieldLabel>Status</FieldLabel>
-              <Badge variant={isNew ? 'secondary' : 'default'}>
-                {isNew ? 'Not saved yet' : 'Saved'}
+              <Badge variant={dirty || isNew ? 'secondary' : 'default'}>
+                {statusLabel(isNew, dirty)}
               </Badge>
+              {errorCount > 0 ? <Badge variant="destructive">{errorCount} errors</Badge> : null}
             </Field>
           </FieldGroup>
         </CardContent>
       </Card>
 
-      {configuration.data.sections.map((section, index) => (
+      {sections.map((section, index) => (
         <Card key={section.id}>
           <CardHeader>
             <Badge variant="outline">{section.type}</Badge>
@@ -49,7 +60,13 @@ export function HomeScreenSummary({ loaded }: { loaded: LoadedConfiguration }) {
   );
 }
 
-function sectionLabel(section: Section): string {
+function statusLabel(isNew: boolean, dirty: boolean): string {
+  if (dirty) return 'Unsaved changes';
+  if (isNew) return 'Not saved yet';
+  return 'Saved';
+}
+
+function sectionLabel(section: DraftSection): string {
   if (section.type === 'text') return section.title.text;
   if (section.type === 'cta') return section.label;
   return 'Image carousel';

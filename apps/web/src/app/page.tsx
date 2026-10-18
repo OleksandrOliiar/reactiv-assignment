@@ -1,4 +1,5 @@
-import { HomeScreenSummary } from '@/features/configuration/home-screen-summary';
+import { EditorScreen } from '@/features/editor/editor-screen';
+import { EditorStoreProvider } from '@/features/editor/editor-store-provider';
 import { env } from '@/env';
 import { ConfigServiceError } from '@/features/configuration/api/config-service-client';
 import { loadConfiguration } from '@/features/configuration/api/load-configuration';
@@ -7,7 +8,11 @@ export const dynamic = 'force-dynamic';
 
 export default async function HomePage() {
   const loaded = await loadHomeScreen();
-  return <HomeScreenSummary loaded={loaded} />;
+  return (
+    <EditorStoreProvider initial={loaded}>
+      <EditorScreen />
+    </EditorStoreProvider>
+  );
 }
 
 async function loadHomeScreen() {

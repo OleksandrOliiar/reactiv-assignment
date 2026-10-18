@@ -33,6 +33,12 @@ export type DraftDocument = {
 
 export type SectionType = DraftSection['type'];
 
+export function sectionTitle(section: DraftSection): string {
+  if (section.type === 'text') return section.title.text || 'Untitled text';
+  if (section.type === 'cta') return section.label || 'Untitled button';
+  return `Carousel, ${section.images.length} ${section.images.length === 1 ? 'image' : 'images'}`;
+}
+
 export function toDraftDocument(data: ConfigurationData): DraftDocument {
   return structuredClone(data);
 }

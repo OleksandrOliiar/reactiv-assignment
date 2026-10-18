@@ -42,7 +42,7 @@ export function CarouselPreview({
   }
 
   return (
-    <Carousel className="px-10" opts={{ align: 'start' }}>
+    <Carousel opts={{ align: 'start' }}>
       <CarouselContent>
         {section.images.map((image, index) => (
           <CarouselItem key={image.id}>
@@ -57,8 +57,8 @@ export function CarouselPreview({
           </CarouselItem>
         ))}
       </CarouselContent>
-      <CarouselPrevious />
-      <CarouselNext />
+      <CarouselPrevious className="left-2" />
+      <CarouselNext className="right-2" />
     </Carousel>
   );
 }

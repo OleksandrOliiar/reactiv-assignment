@@ -52,7 +52,7 @@ export function CarouselEditor({
             className="w-full"
             aria-invalid={Boolean(errors.aspectRatio)}
           >
-            <SelectValue />
+            <SelectValue>{ASPECT_LABELS[section.aspectRatio]}</SelectValue>
           </SelectTrigger>
           <SelectContent>
             {ASPECT_RATIOS.map((ratio) => (

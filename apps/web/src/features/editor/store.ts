@@ -23,6 +23,7 @@ export type EditorState = {
   duplicateSection: (id: string) => void;
   removeSection: (id: string) => void;
   moveSection: (id: string, direction: 'up' | 'down') => void;
+  reorderSection: (id: string, overId: string) => void;
   updateSection: (id: string, update: (section: DraftSection) => DraftSection) => void;
   addImage: (sectionId: string) => void;
   updateImage: (
@@ -96,6 +97,19 @@ export function createEditorStore({
           sections: moveById(state.document.sections, id, direction),
         },
       }));
+    },
+    reorderSection(id, overId) {
+      set((state) => {
+        const sections = state.document.sections;
+        const from = sections.findIndex((section) => section.id === id);
+        const to = sections.findIndex((section) => section.id === overId);
+        if (from < 0 || to < 0 || from === to) return state;
+        const next = sections.slice();
+        const [section] = next.splice(from, 1);
+        if (!section) return state;
+        next.splice(to, 0, section);
+        return { document: { sections: next } };
+      });
     },
     updateSection(id, update) {
       set((state) => ({
@@ -190,15 +204,27 @@ export function selectIsDirty(state: EditorState): boolean {
 
 export type FieldErrors = Record<string, Record<string, string>>;
 
+const NO_ERRORS: FieldErrors = {};
+const validationCache = new WeakMap<DraftDocument, FieldErrors>();
+
+/** Stable per document, which `useSyncExternalStore` needs from selectors. */
 export function selectValidation(state: EditorState): FieldErrors {
-  const parsed = configurationDataSchema.safeParse(state.document);
-  if (parsed.success) return {};
+  const cached = validationCache.get(state.document);
+  if (cached) return cached;
+  const errors = validate(state.document);
+  validationCache.set(state.document, errors);
+  return errors;
+}
+
+function validate(document: DraftDocument): FieldErrors {
+  const parsed = configurationDataSchema.safeParse(document);
+  if (parsed.success) return NO_ERRORS;
 
   const errors: FieldErrors = {};
   for (const issue of parsed.error.issues) {
     const [head, index, ...rest] = issue.path;
     const section =
-      head === 'sections' && typeof index === 'number' ? state.document.sections[index] : undefined;
+      head === 'sections' && typeof index === 'number' ? document.sections[index] : undefined;
     const sectionKey = section?.id ?? '_screen';
     const field = section
       ? rest.map(String).join('.') || 'section'

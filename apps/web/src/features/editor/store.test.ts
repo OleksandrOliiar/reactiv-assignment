@@ -65,6 +65,17 @@ describe('editor store', () => {
     );
   });
 
+  it('moves a dragged section to the position of the section it was dropped on', () => {
+    const editor = store();
+    const [first, , last] = defaultConfigurationData.sections;
+    editor.getState().reorderSection(first?.id ?? '', last?.id ?? '');
+    expect(editor.getState().document.sections.map((section) => section.id)).toEqual([
+      defaultConfigurationData.sections[1]?.id,
+      last?.id,
+      first?.id,
+    ]);
+  });
+
   it('maps invalid draft values to the section that owns them', () => {
     const editor = store();
     const textId =
@@ -75,6 +86,7 @@ describe('editor store', () => {
     });
 
     expect(selectValidation(editor.getState())[textId]?.['title.color']).toMatch(/hex color/i);
+    expect(selectValidation(editor.getState())).toBe(selectValidation(editor.getState()));
     expect(selectIsDirty(editor.getState())).toBe(true);
   });
 

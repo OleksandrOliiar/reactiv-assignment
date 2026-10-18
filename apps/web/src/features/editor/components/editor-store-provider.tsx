@@ -4,7 +4,15 @@ import { createContext, useContext, useState, type ReactNode } from 'react';
 import { useStore } from 'zustand';
 
 import type { LoadedConfiguration } from '../types/types';
-import { selectActions, selectIsDirty, selectSelectedSectionId, selectValidation, selectVersion, selectIsNew, selectSections } from '../store/selectors';
+import {
+  selectActions,
+  selectIsDirty,
+  selectSelectedSectionId,
+  selectValidation,
+  selectVersion,
+  selectIsNew,
+  selectSections,
+} from '../store/selectors';
 import { createEditorStore, type EditorStoreApi } from '../store/store';
 import type { EditorStore } from '../store/types';
 
@@ -22,10 +30,14 @@ export function EditorStoreProvider({
   return <EditorStoreContext.Provider value={store}>{children}</EditorStoreContext.Provider>;
 }
 
-export function useEditorStore<T>(selector: (store: EditorStore) => T): T {
+export function useEditorStoreApi(): EditorStoreApi {
   const store = useContext(EditorStoreContext);
   if (!store) throw new Error('useEditorStore must be used within EditorStoreProvider');
-  return useStore(store, selector);
+  return store;
+}
+
+export function useEditorStore<T>(selector: (store: EditorStore) => T): T {
+  return useStore(useEditorStoreApi(), selector);
 }
 
 export function useEditorIsDirty() {

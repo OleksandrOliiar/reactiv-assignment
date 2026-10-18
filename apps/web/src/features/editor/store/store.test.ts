@@ -95,6 +95,26 @@ describe('editor store', () => {
     expect(selectIsDirty(editor.getState())).toBe(true);
   });
 
+  it('shows server field errors until the draft changes', () => {
+    const editor = store();
+    const textId =
+      defaultConfigurationData.sections.find((section) => section.type === 'text')?.id ?? '';
+    editor.getState().actions.setServerErrors({
+      [textId]: { 'title.color': 'Rejected by the configuration service' },
+    });
+
+    expect(selectValidation(editor.getState())[textId]?.['title.color']).toMatch(
+      /configuration service/,
+    );
+    expect(selectValidation(editor.getState())).toBe(selectValidation(editor.getState()));
+
+    editor.getState().actions.updateSection(textId, (section) => {
+      if (section.type !== 'text') return section;
+      return { ...section, title: { ...section.title, text: 'Hello' } };
+    });
+    expect(selectValidation(editor.getState())[textId]?.['title.color']).toBeUndefined();
+  });
+
   it('marks a save as the new clean snapshot', () => {
     const editor = store();
     editor.getState().actions.addSection('cta');

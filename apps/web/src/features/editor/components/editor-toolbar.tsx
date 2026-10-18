@@ -5,6 +5,7 @@ import { Card, CardAction, CardDescription, CardHeader, CardTitle } from '@/shar
 import { AddSectionMenu } from './add-section-menu';
 import { DiscardChangesDialog } from './discard-changes-dialog';
 import { EditorStatus } from './editor-status';
+import { SaveButton } from './save-button';
 
 export function EditorToolbar() {
   return (
@@ -17,6 +18,7 @@ export function EditorToolbar() {
         <CardAction className="flex flex-wrap justify-end gap-2">
           <AddSectionMenu />
           <DiscardChangesDialog />
+          <SaveButton />
         </CardAction>
       </CardHeader>
     </Card>

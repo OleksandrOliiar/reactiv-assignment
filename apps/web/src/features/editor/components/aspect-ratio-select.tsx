@@ -14,7 +14,7 @@ const ASPECT_LABELS: Record<AspectRatio, string> = {
 export function AspectRatioSelect({
   sectionId,
   currentValue,
-  errors
+  errors,
 }: {
   sectionId: string;
   currentValue: AspectRatio;

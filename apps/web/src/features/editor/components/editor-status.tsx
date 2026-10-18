@@ -1,5 +1,10 @@
 import { Badge } from '@/shared/ui/badge';
-import { useEditorIsDirty, useEditorValidation, useEditorVersion, useEditorIsNew } from './editor-store-provider';
+import {
+  useEditorIsDirty,
+  useEditorValidation,
+  useEditorVersion,
+  useEditorIsNew,
+} from './editor-store-provider';
 
 function statusLabel(isNew: boolean, dirty: boolean): string {
   if (dirty) return 'Unsaved changes';

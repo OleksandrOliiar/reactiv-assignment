@@ -15,6 +15,7 @@ type EditorState = {
   document: DraftDocument;
   savedDocument: DraftDocument;
   selectedSectionId: string | null;
+  serverErrors: FieldErrors;
 };
 
 type EditorAction = {
@@ -37,6 +38,8 @@ type EditorAction = {
   markSaved: (configuration: Configuration) => void;
   discardChanges: () => void;
   replaceFromServer: (loaded: LoadedConfiguration) => void;
+  setServerErrors: (errors: FieldErrors) => void;
+  markForCreate: () => void;
 };
 
 export type EditorStore = {

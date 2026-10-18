@@ -37,6 +37,28 @@ export function duplicateSection(section: DraftSection, createId: () => string):
   return { ...structuredClone(section), id: createId() };
 }
 
+export function serverDetailsToFieldErrors(
+  document: DraftDocument,
+  details: { path: string; message: string }[],
+): FieldErrors {
+  const errors: FieldErrors = {};
+  for (const detail of details) {
+    const parts = detail.path.split('.');
+    const sectionsIndex = parts.lastIndexOf('sections');
+    const index = Number(parts[sectionsIndex + 1]);
+    const section =
+      sectionsIndex >= 0 && Number.isInteger(index) ? document.sections[index] : undefined;
+    const sectionKey = section?.id ?? '_screen';
+    const field = section
+      ? parts.slice(sectionsIndex + 2).join('.') || 'section'
+      : detail.path || 'screen';
+    const fields = errors[sectionKey] ?? {};
+    if (!fields[field]) fields[field] = detail.message;
+    errors[sectionKey] = fields;
+  }
+  return errors;
+}
+
 export function validate(document: DraftDocument): FieldErrors {
   const parsed = configurationDataSchema.safeParse(document);
   if (parsed.success) return {};

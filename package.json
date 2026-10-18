@@ -11,7 +11,7 @@
     "build": "pnpm -r --if-present build",
     "test": "vitest run",
     "test:watch": "vitest",
-    "lint": "eslint .",
+    "lint": "eslint . && pnpm --filter @reactiv/web lint",
     "lint:fix": "eslint . --fix",
     "format": "prettier --write .",
     "format:check": "prettier --check .",

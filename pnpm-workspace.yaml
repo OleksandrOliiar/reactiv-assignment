@@ -4,6 +4,8 @@ packages:
 
 allowBuilds:
   esbuild: true
+  sharp: true
+  unrs-resolver: true
 
 minimumReleaseAgeExclude:
   - eslint@10.13.0

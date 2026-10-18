@@ -3,5 +3,7 @@ build
 coverage
 node_modules
 .react-router
+.next
+next-env.d.ts
 pnpm-lock.yaml
 drizzle

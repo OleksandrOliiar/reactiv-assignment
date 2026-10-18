@@ -13,6 +13,7 @@ export default defineConfig(
       '**/node_modules/**',
       '**/.react-router/**',
       '**/drizzle/**',
+      'apps/web/**',
     ],
   },
   eslint.configs.recommended,

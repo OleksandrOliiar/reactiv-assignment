@@ -27,7 +27,6 @@ import { sectionTitle } from '../utils/utils';
 import {
   useEditorActions,
   useEditorSections,
-  useEditorStore,
   useEditorValidation,
 } from '../components/editor-store-provider';
 import { SectionCard } from '../components/section-card';

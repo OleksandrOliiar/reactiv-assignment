@@ -2,39 +2,14 @@
 
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import {
-  ArrowDown,
-  ArrowUp,
-  ChevronDown,
-  Copy,
-  GripVertical,
-  MoreHorizontal,
-  Trash2,
-} from 'lucide-react';
-import { useState } from 'react';
+import { ChevronDown, GripVertical } from 'lucide-react';
 
 import { cn } from '@/shared/lib/utils';
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from '@/shared/ui/alert-dialog';
 import { Badge } from '@/shared/ui/badge';
 import { Button } from '@/shared/ui/button';
-import { Card, CardAction, CardContent, CardHeader, CardTitle } from '@/shared/ui/card';
+import { Card, CardContent, CardHeader } from '@/shared/ui/card';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/shared/ui/collapsible';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@/shared/ui/dropdown-menu';
+
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/shared/ui/tooltip';
 
 import { useEditorActions, useEditorSelectedSectionId } from './editor-store-provider';
@@ -42,6 +17,7 @@ import { sectionTitle } from '../utils/utils';
 import { DraftSection } from '../types/types';
 import { SectionEditor, sectionRegistry } from './sections-registry';
 import type { SectionErrors } from '../types/types';
+import { SectionMenu } from './section-menu';
 
 type SectionCardProps = {
   section: DraftSection;
@@ -52,8 +28,7 @@ type SectionCardProps = {
 
 export function SectionCard({ section, index, count, errors }: SectionCardProps) {
   const selected = useEditorSelectedSectionId() === section.id;
-  const { moveSection, duplicateSection, removeSection, selectSection } = useEditorActions();
-  const [confirmingDelete, setConfirmingDelete] = useState(false);
+  const { moveSection, selectSection } = useEditorActions();
   const {
     attributes,
     listeners,
@@ -77,11 +52,47 @@ export function SectionCard({ section, index, count, errors }: SectionCardProps)
     >
       <Card
         ref={setNodeRef}
-        style={{ transform: CSS.Transform.toString(transform), transition }}
-        className={cn(isDragging && 'relative z-10 opacity-80 shadow-lg')}
+        style={{
+          transform: CSS.Transform.toString(transform),
+          transition,
+        }}
+        className={cn('gap-0 py-0', isDragging && 'relative z-10 opacity-80 shadow-lg')}
       >
-        <CardHeader>
-          <CardTitle className="flex min-w-0 items-center gap-2">
+        <CollapsibleTrigger asChild>
+          <CardHeader className="relative flex min-h-14 flex-row items-center gap-2 p-2">
+            {/* Full-header collapsible trigger */}
+            <CollapsibleTrigger asChild>
+              <Button
+                type="button"
+                variant="ghost"
+                className={cn(
+                  'absolute inset-0 z-0 h-full w-full min-w-0 justify-start gap-2 rounded-t-md pl-12 pr-12 text-left',
+                  selected ? 'rounded-b-none' : 'rounded-b-md',
+                )}
+              >
+                <Icon className="shrink-0" />
+
+                <span className="truncate">
+                  {index + 1}. {title}
+                </span>
+
+                <Badge variant="outline" className="hidden shrink-0 sm:inline-flex">
+                  {definition.label}
+                </Badge>
+
+                {errorCount > 0 && (
+                  <Badge variant="destructive" className="shrink-0">
+                    {errorCount} {errorCount === 1 ? 'error' : 'errors'}
+                  </Badge>
+                )}
+
+                <ChevronDown
+                  className={cn('ml-auto shrink-0 transition-transform', selected && 'rotate-180')}
+                />
+              </Button>
+            </CollapsibleTrigger>
+
+            {/* Drag handle stays independent of the trigger */}
             <Tooltip>
               <TooltipTrigger asChild>
                 <Button
@@ -89,105 +100,36 @@ export function SectionCard({ section, index, count, errors }: SectionCardProps)
                   type="button"
                   variant="ghost"
                   size="icon-sm"
-                  className="cursor-grab touch-none active:cursor-grabbing"
+                  className="relative z-10 shrink-0 cursor-grab touch-none active:cursor-grabbing"
                   {...attributes}
                   {...listeners}
                   aria-label={`Reorder ${title}`}
                   aria-roledescription="sortable"
                   onKeyDown={(event) => {
                     if (event.key !== 'ArrowUp' && event.key !== 'ArrowDown') return;
+
                     event.preventDefault();
                     moveSection(section.id, event.key === 'ArrowUp' ? 'up' : 'down');
                   }}
+                  onClick={(e) => e.stopPropagation()}
                 >
                   <GripVertical />
                 </Button>
               </TooltipTrigger>
               <TooltipContent>Drag, or focus and press the up or down arrow key</TooltipContent>
             </Tooltip>
-            <CollapsibleTrigger asChild>
-              <Button type="button" variant="ghost" className="min-w-0 flex-1 justify-start">
-                <Icon />
-                <span className="truncate">
-                  {index + 1}. {title}
-                </span>
-                <ChevronDown
-                  className={cn('ml-auto transition-transform', selected && 'rotate-180')}
-                />
-              </Button>
-            </CollapsibleTrigger>
-          </CardTitle>
-          <CardAction className="flex items-center gap-2 mt-0.5">
-            <Badge variant="outline" className="hidden sm:inline-flex">
-              {definition.label}
-            </Badge>
-            {errorCount > 0 ? (
-              <Badge variant="destructive">
-                {errorCount} {errorCount === 1 ? 'error' : 'errors'}
-              </Badge>
-            ) : null}
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="icon-sm"
-                  aria-label={`Actions for ${title}`}
-                >
-                  <MoreHorizontal />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuItem
-                  disabled={index === 0}
-                  onSelect={() => moveSection(section.id, 'up')}
-                >
-                  <ArrowUp />
-                  Move up
-                </DropdownMenuItem>
-                <DropdownMenuItem
-                  disabled={index === count - 1}
-                  onSelect={() => moveSection(section.id, 'down')}
-                >
-                  <ArrowDown />
-                  Move down
-                </DropdownMenuItem>
-                <DropdownMenuItem onSelect={() => duplicateSection(section.id)}>
-                  <Copy />
-                  Duplicate
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem variant="destructive" onSelect={() => setConfirmingDelete(true)}>
-                  <Trash2 />
-                  Delete
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </CardAction>
-        </CardHeader>
+
+            {/* Menu stays above the trigger */}
+            <div className="relative z-10 ml-auto shrink-0">
+              <SectionMenu sectionId={section.id} title={title} index={index} count={count} />
+            </div>
+          </CardHeader>
+        </CollapsibleTrigger>
         <CollapsibleContent asChild>
-          <CardContent>
+          <CardContent className="py-(--card-spacing)">
             <SectionEditor section={section} errors={errors} />
           </CardContent>
         </CollapsibleContent>
-
-        <AlertDialog open={confirmingDelete} onOpenChange={setConfirmingDelete}>
-          <AlertDialogContent>
-            <AlertDialogHeader>
-              <AlertDialogTitle>Delete this section?</AlertDialogTitle>
-              <AlertDialogDescription>
-                {title} will be removed from the draft. Discard changes to bring it back before
-                saving.
-              </AlertDialogDescription>
-            </AlertDialogHeader>
-            <AlertDialogFooter>
-              <AlertDialogCancel>Cancel</AlertDialogCancel>
-              <AlertDialogAction variant="destructive" onClick={() => removeSection(section.id)}>
-                Delete
-              </AlertDialogAction>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </AlertDialog>
       </Card>
     </Collapsible>
   );

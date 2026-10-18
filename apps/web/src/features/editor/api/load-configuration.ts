@@ -6,8 +6,8 @@ import {
   ConfigServiceError,
   createConfigServiceClient,
   type ConfigServiceClient,
-} from '@/features/configuration/api/config-service-client';
-import type { LoadedConfiguration } from '@/features/configuration/types';
+} from '@/features/editor/api/config-service-client';
+import type { LoadedConfiguration } from '@/features/editor/types/types';
 
 export async function loadConfiguration(
   id: string,

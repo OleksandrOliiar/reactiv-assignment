@@ -1,15 +1,24 @@
 'use client';
 
-import { GalleryHorizontal, MousePointerClick, Type } from 'lucide-react';
+import { GalleryHorizontal, LucideIcon, MousePointerClick, Type } from 'lucide-react';
 
-import type { DraftSection, SectionType } from '@/features/editor/draft';
-import { CarouselEditor } from '@/features/sections/carousel/carousel-editor';
-import { CarouselPreview } from '@/features/sections/carousel/carousel-preview';
-import { CtaEditor } from '@/features/sections/cta/cta-editor';
-import { CtaPreview } from '@/features/sections/cta/cta-preview';
-import { TextEditor } from '@/features/sections/text/text-editor';
-import { TextPreview } from '@/features/sections/text/text-preview';
-import type { SectionDefinition, SectionErrors } from '@/features/sections/types';
+import type { DraftSection, SectionType } from '../types/types';
+import { CarouselEditor } from './carousel-editor';
+import { CarouselPreview } from './carousel-preview';
+import { CtaEditor } from './cta-editor';
+import { CtaPreview } from './cta-preview';
+import { TextEditor } from './text-editor';
+import { TextPreview } from './text-preview';
+import { ComponentType } from 'react';
+import type { SectionErrors } from '../types/types';
+
+type SectionDefinition<T extends DraftSection> = {
+  type: T['type'];
+  label: string;
+  icon: LucideIcon;
+  Editor: ComponentType<{ section: T; errors: SectionErrors }>;
+  Preview: ComponentType<{ section: T }>;
+};
 
 export const sectionRegistry = {
   carousel: {

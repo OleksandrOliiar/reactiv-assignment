@@ -1,4 +1,11 @@
 import { hexColorSchema } from '@reactiv/contracts';
+import type { DraftSection } from '../types/types';
+
+export function sectionTitle(section: DraftSection): string {
+  if (section.type === 'text') return section.title.text || 'Untitled text';
+  if (section.type === 'cta') return section.label || 'Untitled button';
+  return `Carousel, ${section.images.length} ${section.images.length === 1 ? 'image' : 'images'}`;
+}
 
 /**
  * A six-digit color for the picker and preview. `#RGB` is expanded because

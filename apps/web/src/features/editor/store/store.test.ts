@@ -1,8 +1,9 @@
 import { defaultConfigurationData, type Configuration } from '@reactiv/contracts';
 import { describe, expect, it } from 'vitest';
 
-import type { LoadedConfiguration } from '@/features/configuration/types';
-import { createEditorStore, selectIsDirty, selectValidation } from '@/features/editor/store';
+import type { LoadedConfiguration } from '@/features/editor/types/types';
+import { createEditorStore } from '@/features/editor/store/store';
+import { selectIsDirty, selectValidation } from '@/features/editor/store/selectors';
 
 const configuration: Configuration = {
   id: 'default',
@@ -25,9 +26,11 @@ function store() {
 describe('editor store', () => {
   it('starts clean with the loaded document selected', () => {
     const editor = store();
-    expect(editor.getState().id).toBe('default');
-    expect(editor.getState().version).toBe(3);
-    expect(editor.getState().selectedSectionId).toBe(defaultConfigurationData.sections[0]?.id);
+    expect(editor.getState().state.id).toBe('default');
+    expect(editor.getState().state.version).toBe(3);
+    expect(editor.getState().state.selectedSectionId).toBe(
+      defaultConfigurationData.sections[0]?.id,
+    );
     expect(selectIsDirty(editor.getState())).toBe(false);
     expect(selectValidation(editor.getState())).toEqual({});
   });
@@ -36,31 +39,33 @@ describe('editor store', () => {
     const editor = store();
     const textId = defaultConfigurationData.sections[1]?.id;
     expect(textId).toBeTruthy();
-    editor.getState().updateSection(textId ?? '', (section) => {
+    editor.getState().actions.updateSection(textId ?? '', (section) => {
       if (section.type !== 'text') return section;
       return { ...section, title: { ...section.title, text: 'Hello' } };
     });
     expect(selectIsDirty(editor.getState())).toBe(true);
 
-    editor.getState().discardChanges();
+    editor.getState().actions.discardChanges();
     expect(selectIsDirty(editor.getState())).toBe(false);
-    expect(editor.getState().document.sections[1]).toEqual(defaultConfigurationData.sections[1]);
+    expect(editor.getState().state.document.sections[1]).toEqual(
+      defaultConfigurationData.sections[1],
+    );
   });
 
   it('adds, duplicates, reorders, and removes sections', () => {
     const editor = store();
-    editor.getState().addSection('text', 0);
-    expect(editor.getState().document.sections[0]?.id).toBe('id-1');
-    expect(editor.getState().selectedSectionId).toBe('id-1');
+    editor.getState().actions.addSection('text', 0);
+    expect(editor.getState().state.document.sections[0]?.id).toBe('id-1');
+    expect(editor.getState().state.selectedSectionId).toBe('id-1');
 
-    editor.getState().duplicateSection('id-1');
-    expect(editor.getState().document.sections[1]?.id).toBe('id-2');
+    editor.getState().actions.duplicateSection('id-1');
+    expect(editor.getState().state.document.sections[1]?.id).toBe('id-2');
 
-    editor.getState().moveSection('id-2', 'up');
-    expect(editor.getState().document.sections[0]?.id).toBe('id-2');
+    editor.getState().actions.moveSection('id-2', 'up');
+    expect(editor.getState().state.document.sections[0]?.id).toBe('id-2');
 
-    editor.getState().removeSection('id-2');
-    expect(editor.getState().document.sections.some((section) => section.id === 'id-2')).toBe(
+    editor.getState().actions.removeSection('id-2');
+    expect(editor.getState().state.document.sections.some((section) => section.id === 'id-2')).toBe(
       false,
     );
   });
@@ -68,8 +73,8 @@ describe('editor store', () => {
   it('moves a dragged section to the position of the section it was dropped on', () => {
     const editor = store();
     const [first, , last] = defaultConfigurationData.sections;
-    editor.getState().reorderSection(first?.id ?? '', last?.id ?? '');
-    expect(editor.getState().document.sections.map((section) => section.id)).toEqual([
+    editor.getState().actions.reorderSection(first?.id ?? '', last?.id ?? '');
+    expect(editor.getState().state.document.sections.map((section) => section.id)).toEqual([
       defaultConfigurationData.sections[1]?.id,
       last?.id,
       first?.id,
@@ -80,7 +85,7 @@ describe('editor store', () => {
     const editor = store();
     const textId =
       defaultConfigurationData.sections.find((section) => section.type === 'text')?.id ?? '';
-    editor.getState().updateSection(textId, (section) => {
+    editor.getState().actions.updateSection(textId, (section) => {
       if (section.type !== 'text') return section;
       return { ...section, title: { ...section.title, color: 'red' } };
     });
@@ -92,15 +97,15 @@ describe('editor store', () => {
 
   it('marks a save as the new clean snapshot', () => {
     const editor = store();
-    editor.getState().addSection('cta');
-    editor.getState().markSaved({
+    editor.getState().actions.addSection('cta');
+    editor.getState().actions.markSaved({
       ...configuration,
       version: 4,
-      data: editor.getState().document,
+      data: editor.getState().state.document,
     });
 
-    expect(editor.getState().isNew).toBe(false);
-    expect(editor.getState().version).toBe(4);
+    expect(editor.getState().state.isNew).toBe(false);
+    expect(editor.getState().state.version).toBe(4);
     expect(selectIsDirty(editor.getState())).toBe(false);
   });
 });

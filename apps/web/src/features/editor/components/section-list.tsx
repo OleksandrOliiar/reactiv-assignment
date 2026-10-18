@@ -13,10 +13,6 @@ import {
 import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import { LayoutList } from 'lucide-react';
 
-import { AddSectionMenu } from '@/features/editor/add-section-menu';
-import { sectionTitle } from '@/features/editor/draft';
-import { useEditorStore, useValidation } from '@/features/editor/editor-store-provider';
-import { SectionCard } from '@/features/editor/section-card';
 import {
   Empty,
   EmptyContent,
@@ -26,6 +22,11 @@ import {
   EmptyTitle,
 } from '@/shared/ui/empty';
 
+import { AddSectionMenu } from '../components/add-section-menu';
+import { sectionTitle } from '../utils/utils';
+import { useEditorStore, useValidation } from '../components/editor-store-provider';
+import { SectionCard } from '../components/section-card';
+
 const SCREEN_READER_INSTRUCTIONS =
   'Press the up or down arrow key to move this section, or drag it with a pointer.';
 
@@ -34,8 +35,8 @@ const SCREEN_READER_INSTRUCTIONS =
  * the store, because dnd-kit keyboard dragging skips over tall expanded cards.
  */
 export function SectionList() {
-  const sections = useEditorStore((state) => state.document.sections);
-  const reorderSection = useEditorStore((state) => state.reorderSection);
+  const sections = useEditorStore((store) => store.state.document.sections);
+  const reorderSection = useEditorStore((store) => store.actions.reorderSection);
   const errors = useValidation();
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 4 } }));
 

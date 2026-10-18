@@ -3,16 +3,17 @@
 import { ASPECT_RATIOS, LIMITS, type AspectRatio } from '@reactiv/contracts';
 import { ChevronDown, ChevronUp, Plus, Trash2 } from 'lucide-react';
 
-import { useEditorStore } from '@/features/editor/editor-store-provider';
-import type { DraftSection } from '@/features/editor/draft';
-import { UrlField } from '@/features/sections/fields';
-import type { SectionErrors } from '@/features/sections/types';
-import { Alert, AlertDescription } from '@/shared/ui/alert';
+import { Field, FieldError, FieldLabel } from '@/shared/ui/field';
 import { Button } from '@/shared/ui/button';
+import { Alert, AlertDescription } from '@/shared/ui/alert';
 import { Card, CardContent, CardHeader, CardTitle } from '@/shared/ui/card';
 import { Empty, EmptyDescription, EmptyHeader, EmptyTitle } from '@/shared/ui/empty';
-import { Field, FieldError, FieldLabel } from '@/shared/ui/field';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/shared/ui/select';
+
+import type { DraftSection } from '../types/types';
+import { UrlField } from '../components/fields';
+import type { SectionErrors } from '../types/types';
+import { useEditorStore } from '../components/editor-store-provider';
 
 const ASPECT_LABELS: Record<AspectRatio, string> = {
   portrait: 'Portrait',
@@ -27,11 +28,11 @@ export function CarouselEditor({
   section: Extract<DraftSection, { type: 'carousel' }>;
   errors: SectionErrors;
 }) {
-  const updateSection = useEditorStore((state) => state.updateSection);
-  const addImage = useEditorStore((state) => state.addImage);
-  const updateImage = useEditorStore((state) => state.updateImage);
-  const removeImage = useEditorStore((state) => state.removeImage);
-  const moveImage = useEditorStore((state) => state.moveImage);
+  const updateSection = useEditorStore((store) => store.actions.updateSection);
+  const addImage = useEditorStore((store) => store.actions.addImage);
+  const updateImage = useEditorStore((store) => store.actions.updateImage);
+  const removeImage = useEditorStore((store) => store.actions.removeImage);
+  const moveImage = useEditorStore((store) => store.actions.moveImage);
   const atImageLimit = section.images.length >= LIMITS.imagesPerCarousel;
 
   return (

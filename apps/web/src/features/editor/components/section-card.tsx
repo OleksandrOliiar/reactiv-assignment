@@ -13,10 +13,6 @@ import {
 } from 'lucide-react';
 import { useState } from 'react';
 
-import { useEditorStore } from '@/features/editor/editor-store-provider';
-import { sectionTitle, type DraftSection } from '@/features/editor/draft';
-import { SectionEditor, sectionRegistry } from '@/features/sections/registry';
-import type { SectionErrors } from '@/features/sections/types';
 import { cn } from '@/shared/lib/utils';
 import {
   AlertDialog,
@@ -41,6 +37,12 @@ import {
 } from '@/shared/ui/dropdown-menu';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/shared/ui/tooltip';
 
+import { useEditorStore } from '../components/editor-store-provider';
+import { sectionTitle } from '../utils/utils';
+import { DraftSection } from '../types/types';
+import { SectionEditor, sectionRegistry } from '../components/registry';
+import type { SectionErrors } from '../types/types';
+
 type SectionCardProps = {
   section: DraftSection;
   index: number;
@@ -49,11 +51,11 @@ type SectionCardProps = {
 };
 
 export function SectionCard({ section, index, count, errors }: SectionCardProps) {
-  const selected = useEditorStore((state) => state.selectedSectionId === section.id);
-  const selectSection = useEditorStore((state) => state.selectSection);
-  const moveSection = useEditorStore((state) => state.moveSection);
-  const duplicateSection = useEditorStore((state) => state.duplicateSection);
-  const removeSection = useEditorStore((state) => state.removeSection);
+  const selected = useEditorStore((store) => store.state.selectedSectionId === section.id);
+  const selectSection = useEditorStore((store) => store.actions.selectSection);
+  const moveSection = useEditorStore((store) => store.actions.moveSection);
+  const duplicateSection = useEditorStore((store) => store.actions.duplicateSection);
+  const removeSection = useEditorStore((store) => store.actions.removeSection);
   const [confirmingDelete, setConfirmingDelete] = useState(false);
   const {
     attributes,
@@ -118,7 +120,7 @@ export function SectionCard({ section, index, count, errors }: SectionCardProps)
               </Button>
             </CollapsibleTrigger>
           </CardTitle>
-          <CardAction className="flex items-center gap-2">
+          <CardAction className="flex items-center gap-2 mt-0.5">
             <Badge variant="outline" className="hidden sm:inline-flex">
               {definition.label}
             </Badge>

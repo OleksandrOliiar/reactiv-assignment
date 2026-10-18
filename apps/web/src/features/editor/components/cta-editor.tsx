@@ -2,10 +2,10 @@
 
 import { LIMITS } from '@reactiv/contracts';
 
-import { useEditorStore } from '@/features/editor/editor-store-provider';
-import type { DraftSection } from '@/features/editor/draft';
-import { ColorField, TextField, UrlField } from '@/features/sections/fields';
-import type { SectionErrors } from '@/features/sections/types';
+import type { DraftSection } from '../types/types';
+import type { SectionErrors } from '../types/types';
+import { useEditorStore } from '../components/editor-store-provider';
+import { ColorField, TextField, UrlField } from './fields';
 
 export function CtaEditor({
   section,
@@ -14,7 +14,7 @@ export function CtaEditor({
   section: Extract<DraftSection, { type: 'cta' }>;
   errors: SectionErrors;
 }) {
-  const updateSection = useEditorStore((state) => state.updateSection);
+  const updateSection = useEditorStore((store) => store.actions.updateSection);
 
   function update(
     patch: Partial<Pick<typeof section, 'label' | 'url' | 'buttonColor' | 'labelColor'>>,

@@ -1,11 +1,11 @@
 'use client';
 
-import { useIsDirty } from '@/features/editor/editor-store-provider';
-import { EditorToolbar } from '@/features/editor/editor-toolbar';
-import { PhonePreview } from '@/features/editor/phone-preview';
-import { SectionList } from '@/features/editor/section-list';
-import { useUnsavedChangesWarning } from '@/features/editor/use-unsaved-changes-warning';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/shared/ui/tabs';
+import { useIsDirty } from '../components/editor-store-provider';
+import { EditorToolbar } from '../components/editor-toolbar';
+import { PhonePreview } from '../components/phone-preview';
+import { SectionList } from '../components/section-list';
+import { useUnsavedChangesWarning } from '../hooks/use-unsaved-changes-warning';
 
 /**
  * Both panes stay mounted so each editor input renders once. On large screens

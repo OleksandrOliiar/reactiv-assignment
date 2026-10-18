@@ -5,7 +5,6 @@ import { useState } from 'react';
 
 import { httpUrlSchema, type AspectRatio } from '@reactiv/contracts';
 
-import type { DraftSection } from '@/features/editor/draft';
 import {
   Carousel,
   CarouselContent,
@@ -15,6 +14,8 @@ import {
 } from '@/shared/ui/carousel';
 import { Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from '@/shared/ui/empty';
 import { cn } from '@/shared/lib/utils';
+
+import type { DraftSection } from '../types/types';
 
 const ASPECT_CLASS: Record<AspectRatio, string> = {
   portrait: 'aspect-[3/4]',

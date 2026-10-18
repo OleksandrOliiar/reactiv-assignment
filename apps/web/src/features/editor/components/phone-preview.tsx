@@ -2,14 +2,14 @@
 
 import { Smartphone } from 'lucide-react';
 
-import { useEditorStore } from '@/features/editor/editor-store-provider';
-import { SectionPreview } from '@/features/sections/registry';
 import { Card, CardContent } from '@/shared/ui/card';
 import { Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from '@/shared/ui/empty';
 import { ScrollArea } from '@/shared/ui/scroll-area';
+import { useEditorStore } from '../components/editor-store-provider';
+import { SectionPreview } from './registry';
 
 export function PhonePreview() {
-  const sections = useEditorStore((state) => state.document.sections);
+  const sections = useEditorStore((store) => store.state.document.sections);
 
   return (
     <Card

@@ -1,8 +1,5 @@
-import { EditorScreen } from '@/features/editor/editor-screen';
-import { EditorStoreProvider } from '@/features/editor/editor-store-provider';
 import { env } from '@/env';
-import { ConfigServiceError } from '@/features/configuration/api/config-service-client';
-import { loadConfiguration } from '@/features/configuration/api/load-configuration';
+import { ConfigServiceError, loadConfiguration, EditorScreen, EditorStoreProvider } from '@/features/editor';
 
 export const dynamic = 'force-dynamic';
 

@@ -2,11 +2,11 @@
 
 import { LIMITS } from '@reactiv/contracts';
 
-import { safeHexColor } from '@/features/sections/values';
 import { Field, FieldError, FieldLabel } from '@/shared/ui/field';
 import { Input } from '@/shared/ui/input';
 import { InputGroup, InputGroupAddon, InputGroupInput } from '@/shared/ui/input-group';
 import { Textarea } from '@/shared/ui/textarea';
+import { safeHexColor } from '../utils/utils';
 
 type TextFieldProps = {
   id: string;

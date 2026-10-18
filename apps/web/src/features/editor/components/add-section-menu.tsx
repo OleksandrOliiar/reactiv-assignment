@@ -3,8 +3,6 @@
 import { LIMITS } from '@reactiv/contracts';
 import { Plus } from 'lucide-react';
 
-import { useEditorStore } from '@/features/editor/editor-store-provider';
-import { sectionRegistry } from '@/features/sections/registry';
 import { Button } from '@/shared/ui/button';
 import {
   DropdownMenu,
@@ -12,10 +10,14 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/shared/ui/dropdown-menu';
+import { useEditorStore } from './editor-store-provider';
+import { sectionRegistry } from './registry';
 
 export function AddSectionMenu() {
-  const addSection = useEditorStore((state) => state.addSection);
-  const atLimit = useEditorStore((state) => state.document.sections.length >= LIMITS.sections);
+  const addSection = useEditorStore((state) => state.actions.addSection);
+  const atLimit = useEditorStore(
+    (state) => state.state.document.sections.length >= LIMITS.sections,
+  );
 
   return (
     <DropdownMenu>
@@ -29,7 +31,11 @@ export function AddSectionMenu() {
         {Object.values(sectionRegistry).map((definition) => {
           const Icon = definition.icon;
           return (
-            <DropdownMenuItem key={definition.type} onSelect={() => addSection(definition.type)}>
+            <DropdownMenuItem
+              key={definition.type}
+              onSelect={() => addSection(definition.type)}
+              className="whitespace-nowrap"
+            >
               <Icon />
               {definition.label}
             </DropdownMenuItem>

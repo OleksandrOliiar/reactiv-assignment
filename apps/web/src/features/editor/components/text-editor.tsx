@@ -2,10 +2,10 @@
 
 import { LIMITS } from '@reactiv/contracts';
 
-import { useEditorStore } from '@/features/editor/editor-store-provider';
-import type { DraftSection } from '@/features/editor/draft';
-import { ColorField, TextField } from '@/features/sections/fields';
-import type { SectionErrors } from '@/features/sections/types';
+import type { DraftSection } from '../types/types';
+import { ColorField, TextField } from '../components/fields';
+import type { SectionErrors } from '../types/types';
+import { useEditorStore } from '../components/editor-store-provider';
 
 export function TextEditor({
   section,
@@ -14,7 +14,7 @@ export function TextEditor({
   section: Extract<DraftSection, { type: 'text' }>;
   errors: SectionErrors;
 }) {
-  const updateSection = useEditorStore((state) => state.updateSection);
+  const updateSection = useEditorStore((store) => store.actions.updateSection);
 
   function updateBlock(block: 'title' | 'description', key: 'text' | 'color', value: string) {
     updateSection(section.id, (current) => {

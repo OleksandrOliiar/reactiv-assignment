@@ -2,8 +2,6 @@
 
 import { Undo2 } from 'lucide-react';
 
-import { AddSectionMenu } from '@/features/editor/add-section-menu';
-import { useEditorStore, useIsDirty, useValidation } from '@/features/editor/editor-store-provider';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -19,10 +17,17 @@ import { Badge } from '@/shared/ui/badge';
 import { Button } from '@/shared/ui/button';
 import { Card, CardAction, CardDescription, CardHeader, CardTitle } from '@/shared/ui/card';
 
+import { AddSectionMenu } from '../components/add-section-menu';
+import {
+  useEditorStore,
+  useIsDirty,
+  useValidation,
+} from '../components/editor-store-provider';
+
 export function EditorToolbar() {
-  const version = useEditorStore((state) => state.version);
-  const isNew = useEditorStore((state) => state.isNew);
-  const discardChanges = useEditorStore((state) => state.discardChanges);
+  const version = useEditorStore((store) => store.state.version);
+  const isNew = useEditorStore((store) => store.state.isNew);
+  const discardChanges = useEditorStore((store) => store.actions.discardChanges);
   const dirty = useIsDirty();
   const errors = useValidation();
   const errorCount = Object.values(errors).reduce(

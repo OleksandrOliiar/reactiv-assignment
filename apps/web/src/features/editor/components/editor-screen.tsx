@@ -1,10 +1,10 @@
 'use client';
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/shared/ui/tabs';
-import { useIsDirty } from '../components/editor-store-provider';
-import { EditorToolbar } from '../components/editor-toolbar';
-import { PhonePreview } from '../components/phone-preview';
-import { SectionList } from '../components/section-list';
+import { useIsDirty } from './editor-store-provider';
+import { EditorToolbar } from './editor-toolbar';
+import { PhonePreview } from './phone-preview';
+import { SectionList } from './section-list';
 import { useUnsavedChangesWarning } from '../hooks/use-unsaved-changes-warning';
 
 /**
@@ -17,7 +17,6 @@ export function EditorScreen() {
   return (
     <main className="mx-auto flex w-full max-w-6xl flex-col gap-6 px-4 py-6 sm:px-6 lg:py-10">
       <EditorToolbar />
-
       <Tabs
         defaultValue="edit"
         className="lg:grid lg:grid-cols-[minmax(0,1fr)_22rem] lg:items-start lg:gap-8"

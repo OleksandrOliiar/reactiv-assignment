@@ -1,9 +1,9 @@
 import { defaultConfigurationData, type Configuration } from '@reactiv/contracts';
 import { describe, expect, it } from 'vitest';
 
-import type { LoadedConfiguration } from '@/features/editor/types/types';
-import { createEditorStore } from '@/features/editor/store/store';
-import { selectIsDirty, selectValidation } from '@/features/editor/store/selectors';
+import type { LoadedConfiguration } from '../types/types';
+import { createEditorStore } from './store';
+import { selectIsDirty, selectValidation } from './selectors';
 
 const configuration: Configuration = {
   id: 'default',

@@ -11,7 +11,7 @@ import {
   DropdownMenuTrigger,
 } from '@/shared/ui/dropdown-menu';
 import { useEditorStore } from './editor-store-provider';
-import { sectionRegistry } from './registry';
+import { sectionRegistry } from './sections-registry';
 
 export function AddSectionMenu() {
   const addSection = useEditorStore((state) => state.actions.addSection);

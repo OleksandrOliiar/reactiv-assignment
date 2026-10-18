@@ -6,7 +6,7 @@ import { Card, CardContent } from '@/shared/ui/card';
 import { Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from '@/shared/ui/empty';
 import { ScrollArea } from '@/shared/ui/scroll-area';
 import { useEditorStore } from '../components/editor-store-provider';
-import { SectionPreview } from './registry';
+import { SectionPreview } from './sections-registry';
 
 export function PhonePreview() {
   const sections = useEditorStore((store) => store.state.document.sections);
@@ -19,20 +19,26 @@ export function PhonePreview() {
       <ScrollArea className="h-full">
         <CardContent className="flex flex-col gap-4 px-4 py-6">
           {sections.length === 0 ? (
-            <Empty>
-              <EmptyHeader>
-                <EmptyMedia variant="icon">
-                  <Smartphone />
-                </EmptyMedia>
-                <EmptyTitle>Empty screen</EmptyTitle>
-                <EmptyDescription>Sections you add will appear here.</EmptyDescription>
-              </EmptyHeader>
-            </Empty>
+            <NoSectionsMessage />
           ) : (
             sections.map((section) => <SectionPreview key={section.id} section={section} />)
           )}
         </CardContent>
       </ScrollArea>
     </Card>
+  );
+}
+
+function NoSectionsMessage() {
+  return (
+    <Empty>
+      <EmptyHeader>
+        <EmptyMedia variant="icon">
+          <Smartphone />
+        </EmptyMedia>
+        <EmptyTitle>Empty screen</EmptyTitle>
+        <EmptyDescription>Sections you add will appear here.</EmptyDescription>
+      </EmptyHeader>
+    </Empty>
   );
 }

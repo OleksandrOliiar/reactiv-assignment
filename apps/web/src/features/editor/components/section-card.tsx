@@ -37,10 +37,10 @@ import {
 } from '@/shared/ui/dropdown-menu';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/shared/ui/tooltip';
 
-import { useEditorStore } from '../components/editor-store-provider';
+import { useEditorStore } from './editor-store-provider';
 import { sectionTitle } from '../utils/utils';
 import { DraftSection } from '../types/types';
-import { SectionEditor, sectionRegistry } from '../components/registry';
+import { SectionEditor, sectionRegistry } from './sections-registry';
 import type { SectionErrors } from '../types/types';
 
 type SectionCardProps = {

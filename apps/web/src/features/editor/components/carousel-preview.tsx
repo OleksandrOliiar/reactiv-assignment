@@ -1,10 +1,8 @@
-'use client';
-
 import { ImageOff } from 'lucide-react';
-import { useState } from 'react';
 
-import { httpUrlSchema, type AspectRatio } from '@reactiv/contracts';
+import { type AspectRatio } from '@reactiv/contracts';
 
+import { cn } from '@/shared/lib/utils';
 import {
   Carousel,
   CarouselContent,
@@ -13,9 +11,9 @@ import {
   CarouselPrevious,
 } from '@/shared/ui/carousel';
 import { Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from '@/shared/ui/empty';
-import { cn } from '@/shared/lib/utils';
 
 import type { DraftSection } from '../types/types';
+import { SlideImage } from './slide-image';
 
 const ASPECT_CLASS: Record<AspectRatio, string> = {
   portrait: 'aspect-[3/4]',
@@ -29,17 +27,7 @@ export function CarouselPreview({
   section: Extract<DraftSection, { type: 'carousel' }>;
 }) {
   if (section.images.length === 0) {
-    return (
-      <Empty className="border">
-        <EmptyHeader>
-          <EmptyMedia variant="icon">
-            <ImageOff />
-          </EmptyMedia>
-          <EmptyTitle>Carousel is empty</EmptyTitle>
-          <EmptyDescription>Images you add will appear here.</EmptyDescription>
-        </EmptyHeader>
-      </Empty>
-    );
+    return <NoImagesMessage />;
   }
 
   return (
@@ -64,26 +52,16 @@ export function CarouselPreview({
   );
 }
 
-function SlideImage({ url, label }: { url: string; label: string }) {
-  const [failed, setFailed] = useState(false);
-
-  if (!httpUrlSchema.safeParse(url).success || failed) {
-    return (
-      <Empty className="h-full border-0">
-        <EmptyHeader>
-          <EmptyMedia variant="icon">
-            <ImageOff />
-          </EmptyMedia>
-          <EmptyTitle>Image unavailable</EmptyTitle>
-          <EmptyDescription>Use an http or https image URL.</EmptyDescription>
-        </EmptyHeader>
-      </Empty>
-    );
-  }
-
+function NoImagesMessage() {
   return (
-    // User-supplied remote URLs are not part of the Next.js image allowlist.
-    // eslint-disable-next-line @next/next/no-img-element
-    <img src={url} alt={label} className="size-full object-cover" onError={() => setFailed(true)} />
+    <Empty className="border">
+      <EmptyHeader>
+        <EmptyMedia variant="icon">
+          <ImageOff />
+        </EmptyMedia>
+        <EmptyTitle>Carousel is empty</EmptyTitle>
+        <EmptyDescription>Images you add will appear here.</EmptyDescription>
+      </EmptyHeader>
+    </Empty>
   );
 }

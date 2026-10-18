@@ -2,9 +2,8 @@
 
 import { LIMITS } from '@reactiv/contracts';
 
-import type { DraftSection } from '../types/types';
-import type { SectionErrors } from '../types/types';
-import { useEditorStore } from '../components/editor-store-provider';
+import type { DraftSection, SectionErrors } from '../types/types';
+import { useEditorStore } from './editor-store-provider';
 import { ColorField, TextField, UrlField } from './fields';
 
 export function CtaEditor({

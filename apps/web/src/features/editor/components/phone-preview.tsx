@@ -13,6 +13,7 @@ export function PhonePreview() {
 
   return (
     <Card
+      role="region"
       aria-label="Phone preview"
       className="mx-auto aspect-9/19 w-full max-w-88 overflow-hidden rounded-[2.5rem] border-8 border-foreground py-0 ring-0"
     >

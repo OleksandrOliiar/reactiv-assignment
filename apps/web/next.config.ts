@@ -3,7 +3,7 @@ import type { NextConfig } from 'next';
 import './src/env';
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  allowedDevOrigins: ['127.0.0.1', 'localhost'],
   turbopack: {
     rules: {
       '*.css': {

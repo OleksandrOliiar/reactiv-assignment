@@ -5,9 +5,10 @@ import { createOpenApiDocument } from './document';
 
 export function createDocsRouter() {
   const router = Router();
+  const document = createOpenApiDocument();
 
   router.get('/openapi.json', (_req, res) => {
-    res.json(createOpenApiDocument());
+    res.json(document);
   });
 
   router.use(

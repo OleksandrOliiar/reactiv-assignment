@@ -1,48 +1,33 @@
 import type { ErrorResponse } from '@reactiv/contracts';
 import type { ErrorRequestHandler } from 'express';
 import type { Logger } from 'pino';
-import { ZodError } from 'zod';
 
 import { AppError } from './app-error';
-import { zodErrorDetails } from './zod-details';
 
 export function createErrorHandler(logger: Logger): ErrorRequestHandler {
   return (error, req, res, _next) => {
-    const requestId =
-      'id' in req && (typeof req.id === 'string' || typeof req.id === 'number')
-        ? req.id
-        : undefined;
-
     if (error instanceof AppError) {
       res.status(error.status).json(errorBody(error.code, error.message, error.details));
       return;
     }
 
-    if (error instanceof ZodError) {
-      res
-        .status(400)
-        .json(errorBody('VALIDATION_ERROR', 'Invalid request', zodErrorDetails(error)));
+    const bodyError = bodyParserError(error);
+    if (bodyError) {
+      res.status(bodyError.status).json(errorBody('VALIDATION_ERROR', bodyError.message));
       return;
     }
 
-    if (isJsonParseError(error)) {
-      res.status(400).json(errorBody('VALIDATION_ERROR', 'Invalid JSON'));
-      return;
-    }
-
-    logger.error({ err: error, requestId }, 'Unhandled error');
+    logger.error({ err: error, requestId: req.id }, 'Unhandled error');
     res.status(500).json(errorBody('INTERNAL', 'Internal server error'));
   };
 }
 
-function isJsonParseError(error: unknown): error is SyntaxError {
-  return (
-    error instanceof SyntaxError &&
-    'status' in error &&
-    error.status === 400 &&
-    'type' in error &&
-    error.type === 'entity.parse.failed'
-  );
+/** Errors that `express.json()` raises before a route runs. */
+function bodyParserError(error: unknown): { status: number; message: string } | null {
+  const type = typeof error === 'object' && error !== null && 'type' in error ? error.type : null;
+  if (type === 'entity.parse.failed') return { status: 400, message: 'Invalid JSON' };
+  if (type === 'entity.too.large') return { status: 413, message: 'Request body is too large' };
+  return null;
 }
 
 function errorBody(

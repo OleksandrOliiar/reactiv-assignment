@@ -24,7 +24,6 @@ services:
       DATABASE_URL: postgres://reactiv:reactiv@postgres:5432/reactiv
       API_KEY: ${API_KEY:-change-me-to-a-long-random-secret}
       LOG_LEVEL: ${LOG_LEVEL:-info}
-      NODE_ENV: production
       DEFAULT_CONFIG_ID: ${DEFAULT_CONFIG_ID:-default}
     ports:
       - '3001:3001'

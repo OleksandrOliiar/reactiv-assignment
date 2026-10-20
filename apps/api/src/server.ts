@@ -30,19 +30,14 @@ const server = app.listen(env.PORT, () => {
   logger.info({ port: env.PORT }, 'Configuration service listening');
 });
 
-function shutdown(signal: string) {
-  logger.info({ signal }, 'Shutting down');
-  server.close(() => {
-    pool.end().then(
-      () => process.exit(0),
-      () => process.exit(1),
-    );
+for (const signal of ['SIGINT', 'SIGTERM'] as const) {
+  process.on(signal, () => {
+    logger.info({ signal }, 'Shutting down');
+    server.close(() => {
+      pool.end().then(
+        () => process.exit(0),
+        () => process.exit(1),
+      );
+    });
   });
 }
-
-process.on('SIGINT', () => {
-  shutdown('SIGINT');
-});
-process.on('SIGTERM', () => {
-  shutdown('SIGTERM');
-});

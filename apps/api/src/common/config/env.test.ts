@@ -8,11 +8,10 @@ const valid = {
 };
 
 describe('loadEnv', () => {
-  it('applies defaults for port, log level, node env, and config id', () => {
+  it('applies defaults for port, log level, and config id', () => {
     expect(loadEnv(valid)).toMatchObject({
       PORT: 3001,
       LOG_LEVEL: 'info',
-      NODE_ENV: 'development',
       DEFAULT_CONFIG_ID: 'default',
       API_KEY: valid.API_KEY,
     });

@@ -1,4 +1,4 @@
-import { errorResponseSchema, defaultConfigurationData } from '@reactiv/contracts';
+import { LIMITS, errorResponseSchema, defaultConfigurationData } from '@reactiv/contracts';
 import request from 'supertest';
 import { describe, expect, it } from 'vitest';
 
@@ -65,6 +65,30 @@ describe('configuration API', () => {
     expect(errorResponseSchema.parse(conflict.body).error.details?.[0]?.message).toBe(
       'Current version is 2',
     );
+  });
+
+  it('accepts a configuration filled to every limit', async () => {
+    const carousel = defaultConfigurationData.sections.find(
+      (section) => section.type === 'carousel',
+    );
+    if (!carousel) throw new Error('The default configuration has no carousel');
+
+    const url = `https://example.com/${'a'.repeat(LIMITS.url - 'https://example.com/'.length)}`;
+    const sections = Array.from({ length: LIMITS.sections }, (_, section) => ({
+      ...carousel,
+      id: `-${section}`.padStart(LIMITS.id, 'carousel'),
+      images: Array.from({ length: LIMITS.imagesPerCarousel }, (_, image) => ({
+        id: `-${image}`.padStart(LIMITS.id, 'image'),
+        url,
+      })),
+    }));
+
+    const response = await request(app)
+      .post('/v1/configurations')
+      .set('x-api-key', apiKey)
+      .send({ id: 'full', data: { sections } });
+    expect(response.status).toBe(201);
+    expect(response.body.data.sections).toHaveLength(LIMITS.sections);
   });
 
   it('reports validation errors, duplicates, and missing configurations', async () => {

@@ -22,7 +22,8 @@ export function createApp({ configurationsRepository, apiKey, logger }: CreateAp
   app.disable('x-powered-by');
   app.use(createRequestLogger(logger));
   app.use(helmet());
-  app.use(express.json({ limit: '100kb' }));
+  // A screen filled to every contract limit is about 430 kB of JSON.
+  app.use(express.json({ limit: '1mb' }));
 
   app.use(createDocsRouter());
   app.use('/health', createHealthRouter());

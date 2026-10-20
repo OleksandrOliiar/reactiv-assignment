@@ -1,6 +1,6 @@
 import { randomUUID } from 'node:crypto';
 
-import type { ConfigurationData } from '@reactiv/contracts';
+import type { CreateConfigurationRequest, UpdateConfigurationRequest } from '@reactiv/contracts';
 import { CURRENT_SCHEMA_VERSION } from '@reactiv/contracts';
 
 import { ConflictError, NotFoundError } from '../../common/errors/app-error';
@@ -30,7 +30,7 @@ export class ConfigurationsService {
     return toConfiguration(record);
   }
 
-  async create(input: { id?: string; data: ConfigurationData }) {
+  async create(input: CreateConfigurationRequest) {
     const id = input.id ?? this.createId();
     const record = await this.repository.insert({
       id,
@@ -49,7 +49,7 @@ export class ConfigurationsService {
     return toConfiguration(record);
   }
 
-  async update(id: string, input: { version: number; data: ConfigurationData }) {
+  async update(id: string, input: UpdateConfigurationRequest) {
     const updated = await this.repository.updateIfVersion(id, input.version, {
       schemaVersion: CURRENT_SCHEMA_VERSION,
       version: input.version + 1,

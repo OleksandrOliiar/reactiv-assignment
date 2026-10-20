@@ -83,7 +83,6 @@ One `.env` at the repository root. The API and the web app both read that file, 
 | `DATABASE_URL`      | yes      |               | Postgres connection URL                                |
 | `API_KEY`           | yes      |               | At least 16 characters. Sent by clients as `x-api-key` |
 | `LOG_LEVEL`         | no       | `info`        | Pino level                                             |
-| `NODE_ENV`          | no       | `development` | `development`, `test`, or `production`                 |
 | `DEFAULT_CONFIG_ID` | no       | `default`     | Id seeded on startup                                   |
 
 ### Web app

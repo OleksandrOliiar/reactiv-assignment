@@ -11,12 +11,7 @@ export type ConfigurationRecord = {
 
 export type ConfigurationInsert = Omit<ConfigurationRecord, 'createdAt'>;
 
-export type ConfigurationUpdate = {
-  schemaVersion: number;
-  version: number;
-  data: ConfigurationData;
-  updatedAt: Date;
-};
+export type ConfigurationUpdate = Omit<ConfigurationRecord, 'id' | 'createdAt'>;
 
 export interface ConfigurationsRepository {
   findById(id: string): Promise<ConfigurationRecord | null>;

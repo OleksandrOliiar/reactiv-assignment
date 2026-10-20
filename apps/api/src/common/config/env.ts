@@ -14,7 +14,6 @@ export const envSchema = z.object({
   }),
   API_KEY: z.string().min(16, { error: 'API_KEY must be at least 16 characters' }),
   LOG_LEVEL: z.enum(LOG_LEVELS).default('info'),
-  NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
   DEFAULT_CONFIG_ID: entityIdSchema.default('default'),
 });
 
@@ -32,11 +31,11 @@ export function loadEnv(source: NodeJS.ProcessEnv = process.env): Env {
 }
 
 /** Load `.env` when present, then exit if the environment is invalid. */
-export function loadEnvOrExit(source: NodeJS.ProcessEnv = process.env): Env {
+export function loadEnvOrExit(): Env {
   loadDotEnvFile();
 
   try {
-    return loadEnv(source);
+    return loadEnv();
   } catch (error) {
     console.error(error instanceof Error ? error.message : error);
     process.exit(1);

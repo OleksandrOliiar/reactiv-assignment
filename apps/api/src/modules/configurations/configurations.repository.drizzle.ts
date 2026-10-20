@@ -9,8 +9,6 @@ import type {
   ConfigurationsRepository,
 } from './configurations.repository';
 
-type ConfigurationRow = typeof configurations.$inferSelect;
-
 export class DrizzleConfigurationsRepository implements ConfigurationsRepository {
   constructor(private readonly db: Database) {}
 
@@ -20,23 +18,16 @@ export class DrizzleConfigurationsRepository implements ConfigurationsRepository
       .from(configurations)
       .where(eq(configurations.id, id))
       .limit(1);
-    return row ? toRecord(row) : null;
+    return row ?? null;
   }
 
   async insert(configuration: ConfigurationInsert): Promise<ConfigurationRecord | null> {
     const [row] = await this.db
       .insert(configurations)
-      .values({
-        id: configuration.id,
-        schemaVersion: configuration.schemaVersion,
-        version: configuration.version,
-        data: configuration.data,
-        createdAt: configuration.updatedAt,
-        updatedAt: configuration.updatedAt,
-      })
+      .values({ ...configuration, createdAt: configuration.updatedAt })
       .onConflictDoNothing({ target: configurations.id })
       .returning();
-    return row ? toRecord(row) : null;
+    return row ?? null;
   }
 
   async updateIfVersion(
@@ -46,25 +37,9 @@ export class DrizzleConfigurationsRepository implements ConfigurationsRepository
   ): Promise<ConfigurationRecord | null> {
     const [row] = await this.db
       .update(configurations)
-      .set({
-        schemaVersion: update.schemaVersion,
-        version: update.version,
-        data: update.data,
-        updatedAt: update.updatedAt,
-      })
+      .set(update)
       .where(and(eq(configurations.id, id), eq(configurations.version, expectedVersion)))
       .returning();
-    return row ? toRecord(row) : null;
+    return row ?? null;
   }
-}
-
-function toRecord(row: ConfigurationRow): ConfigurationRecord {
-  return {
-    id: row.id,
-    schemaVersion: row.schemaVersion,
-    version: row.version,
-    data: row.data,
-    createdAt: row.createdAt,
-    updatedAt: row.updatedAt,
-  };
 }

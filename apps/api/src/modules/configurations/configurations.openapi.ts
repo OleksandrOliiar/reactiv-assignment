@@ -7,7 +7,7 @@ import {
 import type { ZodType } from 'zod';
 
 import { apiKeySecurity, registry } from '../../common/openapi/registry';
-import { configurationIdParamsSchema } from './configurations.routes';
+import { configurationIdParamsSchema } from './configurations.controller';
 
 const json = (schema: ZodType) => ({
   'application/json': { schema },

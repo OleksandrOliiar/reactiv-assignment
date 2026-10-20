@@ -13,16 +13,8 @@ import {
 import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import { LayoutList } from 'lucide-react';
 
-import {
-  Empty,
-  EmptyContent,
-  EmptyDescription,
-  EmptyHeader,
-  EmptyMedia,
-  EmptyTitle,
-} from '@/shared/ui/empty';
+import { Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from '@/shared/ui/empty';
 
-import { AddSectionMenu } from '../components/add-section-menu';
 import { sectionTitle } from '../utils/utils';
 import {
   useEditorActions,
@@ -101,19 +93,16 @@ export function SectionList() {
 
 function NoSectionsMessage() {
   return (
-    <Empty className="border">
+    <Empty className="border border-dashed bg-card">
       <EmptyHeader>
         <EmptyMedia variant="icon">
           <LayoutList />
         </EmptyMedia>
         <EmptyTitle>No sections yet</EmptyTitle>
         <EmptyDescription>
-          Add a carousel, text block, or button to build the screen.
+          Use Add section to place a carousel, text block, or button on the screen.
         </EmptyDescription>
       </EmptyHeader>
-      <EmptyContent>
-        <AddSectionMenu />
-      </EmptyContent>
     </Empty>
   );
 }

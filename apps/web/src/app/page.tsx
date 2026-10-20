@@ -1,5 +1,10 @@
 import { env } from '@/env';
-import { ConfigServiceError, loadConfiguration, EditorScreen, EditorStoreProvider } from '@/features/editor';
+import {
+  ConfigServiceError,
+  loadConfiguration,
+  EditorScreen,
+  EditorStoreProvider,
+} from '@/features/editor';
 
 export const dynamic = 'force-dynamic';
 

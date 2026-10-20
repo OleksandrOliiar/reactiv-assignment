@@ -50,34 +50,52 @@ export function SectionCard({ section, index, count, errors }: SectionCardProps)
         transform: CSS.Transform.toString(transform),
         transition,
       }}
-      className={cn('rounded-lg border', isDragging && 'relative z-10 opacity-80 shadow-lg')}
+      className={cn(
+        'rounded-xl border bg-card shadow-xs transition-[border-color,box-shadow]',
+        selected ? 'border-primary/30 shadow-sm' : 'hover:border-primary/25 hover:shadow-sm',
+        errorCount > 0 && !selected && 'border-destructive/40',
+        isDragging && 'relative z-10 opacity-90 shadow-lg',
+      )}
       open={selected}
       onOpenChange={(open) => selectSection(open ? section.id : null)}
     >
-      <div className="relative flex min-h-14 items-center gap-2 p-2">
+      <div className="relative flex min-h-16 items-center gap-2 p-2">
         <CollapsibleTrigger asChild>
           <Button
             type="button"
             variant="ghost"
             className={cn(
-              'absolute inset-0 z-0 h-full w-full min-w-0 justify-start gap-2 pl-12 pr-12 text-left active:not-aria-[haspopup]:translate-y-0',
-              selected ? 'rounded-t-md rounded-b-none' : 'rounded-md',
+              'absolute inset-0 z-0 h-full w-full min-w-0 justify-start gap-3 pr-12 pl-11 text-left hover:bg-accent/50 aria-expanded:bg-accent/40 active:not-aria-[haspopup]:translate-y-0',
+              selected ? 'rounded-t-xl rounded-b-none' : 'rounded-xl',
             )}
           >
-            <Icon className="shrink-0" />
-            <span className="truncate">
-              {index + 1}. {title}
+            <span
+              className={cn(
+                'flex size-9 shrink-0 items-center justify-center rounded-lg transition-colors',
+                selected
+                  ? 'bg-primary text-primary-foreground'
+                  : 'bg-accent text-accent-foreground',
+              )}
+            >
+              <Icon />
             </span>
-            <Badge variant="outline" className="hidden shrink-0 sm:inline-flex">
-              {definition.label}
-            </Badge>
+            <span className="flex min-w-0 flex-1 flex-col items-start gap-0.5">
+              <span className="w-full truncate font-medium">
+                <span className="text-muted-foreground tabular-nums">{`${index + 1}.`}</span>{' '}
+                {title}
+              </span>{' '}
+              <span className="text-xs font-normal text-muted-foreground">{definition.label}</span>
+            </span>
             {errorCount > 0 && (
               <Badge variant="destructive" className="shrink-0">
                 {errorCount} {errorCount === 1 ? 'error' : 'errors'}
               </Badge>
             )}
             <ChevronDown
-              className={cn('ml-auto shrink-0 transition-transform', selected && 'rotate-180')}
+              className={cn(
+                'shrink-0 text-muted-foreground transition-transform',
+                selected && 'rotate-180 text-foreground',
+              )}
             />
           </Button>
         </CollapsibleTrigger>
@@ -88,7 +106,7 @@ export function SectionCard({ section, index, count, errors }: SectionCardProps)
               type="button"
               variant="ghost"
               size="icon-sm"
-              className="relative z-10 shrink-0 cursor-grab touch-none active:cursor-grabbing"
+              className="relative z-10 shrink-0 cursor-grab touch-none text-muted-foreground hover:text-foreground active:cursor-grabbing"
               {...attributes}
               {...listeners}
               aria-label={`Reorder ${title}`}
@@ -112,7 +130,7 @@ export function SectionCard({ section, index, count, errors }: SectionCardProps)
           <SectionMenu sectionId={section.id} title={title} index={index} count={count} />
         </div>
       </div>
-      <CollapsibleContent className="border-t p-4">
+      <CollapsibleContent className="border-t px-4 py-5 sm:px-5">
         <SectionEditor section={section} errors={errors} />
       </CollapsibleContent>
     </Collapsible>

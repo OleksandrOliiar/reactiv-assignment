@@ -37,7 +37,7 @@ export function CarouselPreview({
           <CarouselItem key={image.id}>
             <div
               className={cn(
-                'overflow-hidden rounded-lg bg-muted',
+                'overflow-hidden rounded-xl bg-muted',
                 ASPECT_CLASS[section.aspectRatio],
               )}
             >

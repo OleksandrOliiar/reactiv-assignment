@@ -19,18 +19,18 @@ export function CtaPreview({ section }: { section: Extract<DraftSection, { type:
   return (
     <div className="flex flex-col gap-2">
       {httpUrlSchema.safeParse(section.url).success ? (
-        <Button asChild style={style}>
+        <Button asChild style={style} className="h-11 w-full rounded-xl shadow-sm">
           <a href={section.url} target="_blank" rel="noopener noreferrer">
             {label}
           </a>
         </Button>
       ) : (
         <>
-          <Button type="button" style={style}>
+          <Button type="button" style={style} className="h-11 w-full rounded-xl shadow-sm">
             {label}
           </Button>
-          <Alert>
-            <AlertDescription>
+          <Alert className="text-xs">
+            <AlertDescription className="text-xs">
               Enter an http or https URL before this button can open.
             </AlertDescription>
           </Alert>

@@ -9,9 +9,12 @@ export function TextPreview({ section }: { section: Extract<DraftSection, { type
   const descriptionColor = safeHexColor(section.description.color);
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle style={titleColor ? { color: titleColor } : undefined}>
+    <Card className="shadow-xs">
+      <CardHeader className="gap-1.5">
+        <CardTitle
+          className="text-lg leading-tight font-semibold"
+          style={titleColor ? { color: titleColor } : undefined}
+        >
           {section.title.text || 'Untitled'}
         </CardTitle>
         <CardDescription style={descriptionColor ? { color: descriptionColor } : undefined}>

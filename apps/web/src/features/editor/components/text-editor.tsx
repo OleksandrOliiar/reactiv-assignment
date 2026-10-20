@@ -24,7 +24,7 @@ export function TextEditor({
   }
 
   return (
-    <div className="flex flex-col gap-5">
+    <div className="grid gap-5 sm:grid-cols-[minmax(0,1fr)_10rem] sm:items-start sm:gap-x-4">
       <TextField
         id={`${section.id}-title`}
         label="Title"

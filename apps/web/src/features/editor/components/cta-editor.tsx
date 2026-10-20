@@ -24,7 +24,7 @@ export function CtaEditor({
   }
 
   return (
-    <div className="flex flex-col gap-5">
+    <div className="grid gap-5 sm:grid-cols-2 sm:gap-x-4">
       <TextField
         id={`${section.id}-label`}
         label="Button label"

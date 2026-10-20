@@ -29,6 +29,22 @@ describe('configuration API', () => {
     expect(spec.body.paths).toHaveProperty('/v1/configurations/{id}');
   });
 
+  it('serves the docs page under a nonce that matches its scripts', async () => {
+    const response = await request(app).get('/docs');
+    expect(response.status).toBe(200);
+    expect(response.type).toBe('text/html');
+
+    const policy = String(response.headers['content-security-policy']);
+    const scriptSrc = /script-src[^;]*/.exec(policy)?.[0] ?? '';
+    const nonce = /'nonce-([^']+)'/.exec(scriptSrc)?.[1];
+    expect(nonce).toEqual(expect.any(String));
+    expect(scriptSrc).not.toContain('unsafe-inline');
+    expect(response.text).toContain(`nonce="${nonce}"`);
+
+    const health = await request(app).get('/health');
+    expect(health.headers['content-security-policy']).toContain("script-src 'self';");
+  });
+
   it('requires the API key', async () => {
     const response = await request(app).get('/v1/configurations/default');
     expect(response.status).toBe(401);

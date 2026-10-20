@@ -71,7 +71,6 @@ describe('save configuration results', () => {
     expect(
       classifySaveFailure(
         {
-          status: 400,
           code: 'VALIDATION_ERROR',
           message: 'Request validation failed',
           details: [{ path: 'body.data.sections.0.url', message: 'Enter an http or https URL' }],
@@ -87,15 +86,13 @@ describe('save configuration results', () => {
 
   it('turns a version mismatch into a conflict and a missing record into not found', () => {
     expect(
-      classifySaveFailure({ status: 409, code: 'CONFLICT', message: 'Version mismatch' }, document),
+      classifySaveFailure({ code: 'CONFLICT', message: 'Version mismatch' }, document),
     ).toMatchObject({ status: 'conflict' });
 
-    expect(
-      classifySaveFailure({ status: 404, code: 'NOT_FOUND', message: 'Missing' }, document),
-    ).toMatchObject({ status: 'not_found' });
+    expect(classifySaveFailure({ code: 'NOT_FOUND', message: 'Missing' }, document)).toMatchObject({
+      status: 'not_found',
+    });
 
-    expect(
-      classifySaveFailure({ status: 503, code: 'INTERNAL', message: 'Down' }, document),
-    ).toBeNull();
+    expect(classifySaveFailure({ code: 'INTERNAL', message: 'Down' }, document)).toBeNull();
   });
 });

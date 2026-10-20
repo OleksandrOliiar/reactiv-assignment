@@ -1,20 +1,12 @@
 import { createDefaultConfiguration, type Configuration } from '@reactiv/contracts';
 import 'server-only';
 
-import { env } from '@/env';
 import {
   ConfigServiceError,
-  createConfigServiceClient,
+  configServiceClient,
   type ConfigServiceClient,
 } from '@/features/editor/api/config-service-client';
 import type { LoadedConfiguration } from '@/features/editor/types/types';
-
-export function configServiceClient(): ConfigServiceClient {
-  return createConfigServiceClient({
-    baseUrl: env.CONFIG_SERVICE_URL,
-    apiKey: env.CONFIG_SERVICE_API_KEY,
-  });
-}
 
 /** The stored configuration, or null when the id does not exist. */
 export async function findConfiguration(

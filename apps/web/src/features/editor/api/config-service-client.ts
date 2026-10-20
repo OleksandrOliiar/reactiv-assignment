@@ -10,6 +10,8 @@ import {
 import axios, { isAxiosError, type AxiosInstance, type AxiosRequestConfig } from 'axios';
 import 'server-only';
 
+import { env } from '@/env';
+
 const DEFAULT_TIMEOUT_MS = 5_000;
 
 export class ConfigServiceError extends Error {
@@ -86,6 +88,14 @@ export function createConfigServiceClient(options: ClientOptions): ConfigService
       );
     },
   };
+}
+
+/** The client configured from the server environment. */
+export function configServiceClient(): ConfigServiceClient {
+  return createConfigServiceClient({
+    baseUrl: env.CONFIG_SERVICE_URL,
+    apiKey: env.CONFIG_SERVICE_API_KEY,
+  });
 }
 
 function parseConfiguration(payload: unknown): Configuration {

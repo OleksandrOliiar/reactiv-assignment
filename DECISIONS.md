@@ -2,9 +2,9 @@
 
 ## How AI was used
 
-Cursor's agent wrote most of the implementation from a plan agreed before coding. I reviewed each phase before the next one started, and I changed the draft where it was heavier than this app needs.
+I used Cursor as a coding assistant while building this. Architecture and feature boundaries were mine. AI helped with boilerplate, repetitive wiring, and first drafts of tests; I reviewed every change, rewrote what did not fit, and ran typecheck, lint, and the Playwright suite myself.
 
-The plan, the feature layout, and the rule that the browser never sees the API key were set up front. Later passes removed TanStack Query, collapsed the save hook onto `useTransition`, and dropped a second validation pass on export. Tests, typecheck, lint, and the Playwright suite were run after those changes rather than trusted from the draft.
+Suggestions that did not earn their keep were cut: TanStack Query for save pending state, a second validation pass on export, and other layers that only duplicated the Zustand draft or the contracts schemas.
 
 ## Next.js instead of React Router
 

@@ -2,8 +2,11 @@
 
 import { entityIdSchema, type Configuration } from '@reactiv/contracts';
 
-import { ConfigServiceError } from '@/features/editor/api/config-service-client';
-import { configServiceClient, findConfiguration } from '@/features/editor/api/load-configuration';
+import {
+  ConfigServiceError,
+  configServiceClient,
+} from '@/features/editor/api/config-service-client';
+import { findConfiguration } from '@/features/editor/api/load-configuration';
 import {
   classifySaveFailure,
   parseSaveInput,

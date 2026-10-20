@@ -1,11 +1,7 @@
-import {
-  configurationDataSchema,
-  entityIdSchema,
-  type Configuration,
-  type ErrorDetail,
-} from '@reactiv/contracts';
+import { configurationDataSchema, entityIdSchema, type Configuration } from '@reactiv/contracts';
 import { z } from 'zod';
 
+import type { ConfigServiceError } from '@/features/editor/api/config-service-client';
 import { detailsToFieldErrors, issuesToFieldErrors } from '@/features/editor/store/utils';
 import type { DraftDocument, FieldErrors } from '@/features/editor/types/types';
 
@@ -51,30 +47,23 @@ function draftOf(input: unknown): DraftDocument {
   return { sections: Array.isArray(sections) ? sections : [] };
 }
 
-type ServiceFailure = {
-  status: number;
-  code: string;
-  message: string;
-  details?: ErrorDetail[];
-};
-
 /** Maps an expected API failure onto a result the browser can render. */
 export function classifySaveFailure(
-  failure: ServiceFailure,
+  failure: Pick<ConfigServiceError, 'code' | 'message' | 'details'>,
   document: DraftDocument,
 ): SaveResult | null {
-  if (failure.status === 409 || failure.code === 'CONFLICT') {
-    return { status: 'conflict', message: failure.message };
+  switch (failure.code) {
+    case 'CONFLICT':
+      return { status: 'conflict', message: failure.message };
+    case 'NOT_FOUND':
+      return { status: 'not_found', message: failure.message };
+    case 'VALIDATION_ERROR':
+      return {
+        status: 'invalid',
+        message: failure.message,
+        errors: detailsToFieldErrors(document, failure.details ?? []),
+      };
+    default:
+      return null;
   }
-  if (failure.status === 404 || failure.code === 'NOT_FOUND') {
-    return { status: 'not_found', message: failure.message };
-  }
-  if (failure.status === 400 || failure.code === 'VALIDATION_ERROR') {
-    return {
-      status: 'invalid',
-      message: failure.message,
-      errors: detailsToFieldErrors(document, failure.details ?? []),
-    };
-  }
-  return null;
 }

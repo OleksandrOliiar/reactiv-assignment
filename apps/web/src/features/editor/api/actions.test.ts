@@ -7,20 +7,12 @@ const get = vi.fn();
 const create = vi.fn();
 const update = vi.fn();
 
-vi.mock('@/env', () => ({
-  env: {
-    CONFIG_SERVICE_URL: 'http://localhost:3001',
-    CONFIG_SERVICE_API_KEY: 'change-me-to-a-long-random-secret',
-    DEFAULT_CONFIG_ID: 'default',
-  },
-}));
-
 vi.mock('@/features/editor/api/config-service-client', async () => {
   const actual =
     await vi.importActual<typeof import('./config-service-client')>('./config-service-client');
   return {
     ...actual,
-    createConfigServiceClient: (): ConfigServiceClient => ({ get, create, update }),
+    configServiceClient: (): ConfigServiceClient => ({ get, create, update }),
   };
 });
 

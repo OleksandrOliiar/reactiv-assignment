@@ -52,7 +52,9 @@ test.describe('home screen editor', () => {
     await expect(page.getByText('Saved', { exact: true })).toBeVisible();
 
     await page.reload();
-    await expect(page.getByRole('button', { name: new RegExp(`^\\d+\\.\\s*${title}`) })).toBeVisible();
+    await expect(
+      page.getByRole('button', { name: new RegExp(`^\\d+\\.\\s*${title}`) }),
+    ).toBeVisible();
     await expect(page.getByLabel('Phone preview').getByText(title)).toBeVisible();
   });
 
@@ -73,7 +75,9 @@ test.describe('home screen editor', () => {
     await page.getByRole('button', { name: 'Overwrite' }).click();
     await expect(page.getByText('Home screen saved')).toBeVisible();
     await expect(page.getByText('Saved', { exact: true })).toBeVisible();
-    await expect(page.getByRole('button', { name: new RegExp(`^2\\.\\s*${localTitle}`) })).toBeVisible();
+    await expect(
+      page.getByRole('button', { name: new RegExp(`^2\\.\\s*${localTitle}`) }),
+    ).toBeVisible();
   });
 
   test('rejects a malformed import file', async ({ page }) => {

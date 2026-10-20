@@ -69,7 +69,27 @@ On Windows PowerShell, copy the example with `Copy-Item .env.example .env`.
 
 `pnpm dev` starts the API on port 3001 and the web app on port 3000. The API migrates and seeds itself. `pnpm db:migrate` and `pnpm db:seed` are there if you want to run those steps by hand.
 
-Without Docker, create a Postgres 17 database and set `DATABASE_URL` in `.env`. The example URL expects user, password, and database `reactiv`.
+To start them separately, use two terminals from the repository root:
+
+```sh
+pnpm --filter @reactiv/api dev
+pnpm --filter @reactiv/web dev
+```
+
+Both commands read the root `.env`. The API is http://localhost:3001 and the editor is http://localhost:3000.
+
+Without Docker, install Postgres 17 and create the role and database the example URL expects. The API creates the table and the default screen. It does not create the database.
+
+```sh
+psql -U postgres -c "CREATE USER reactiv WITH PASSWORD 'reactiv';"
+psql -U postgres -c "CREATE DATABASE reactiv OWNER reactiv;"
+```
+
+A local server listens on port 5432, so point `DATABASE_URL` at it before starting the API. The example file uses 55432, which is the Docker mapping.
+
+```
+DATABASE_URL=postgres://reactiv:reactiv@localhost:5432/reactiv
+```
 
 ## Environment
 
@@ -77,13 +97,13 @@ One `.env` at the repository root. The API and the web app both read that file, 
 
 ### Configuration service
 
-| Variable            | Required | Default       | Purpose                                                |
-| ------------------- | -------- | ------------- | ------------------------------------------------------ |
-| `PORT`              | no       | `3001`        | HTTP port                                              |
-| `DATABASE_URL`      | yes      |               | Postgres connection URL                                |
-| `API_KEY`           | yes      |               | At least 16 characters. Sent by clients as `x-api-key` |
-| `LOG_LEVEL`         | no       | `info`        | Pino level                                             |
-| `DEFAULT_CONFIG_ID` | no       | `default`     | Id seeded on startup                                   |
+| Variable            | Required | Default   | Purpose                                                |
+| ------------------- | -------- | --------- | ------------------------------------------------------ |
+| `PORT`              | no       | `3001`    | HTTP port                                              |
+| `DATABASE_URL`      | yes      |           | Postgres connection URL                                |
+| `API_KEY`           | yes      |           | At least 16 characters. Sent by clients as `x-api-key` |
+| `LOG_LEVEL`         | no       | `info`    | Pino level                                             |
+| `DEFAULT_CONFIG_ID` | no       | `default` | Id seeded on startup                                   |
 
 ### Web app
 
@@ -146,9 +166,10 @@ Errors use one body:
 | `401`  | `UNAUTHORIZED`     |
 | `404`  | `NOT_FOUND`        |
 | `409`  | `CONFLICT`         |
+| `413`  | `VALIDATION_ERROR` |
 | `500`  | `INTERNAL`         |
 
-`details` is present for validation errors.
+`details` lists the fields that failed validation. A malformed body and a body over 1 MB do not include it.
 
 ## Storage
 

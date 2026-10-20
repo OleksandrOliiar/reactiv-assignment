@@ -1,10 +1,13 @@
 'use client';
 
-import { useMutation } from '@tanstack/react-query';
-import { useState } from 'react';
+import { useState, useTransition } from 'react';
 import { toast } from 'sonner';
 
-import { loadLatestConfiguration, saveConfiguration } from '@/features/editor/api/actions';
+import {
+  loadLatestConfiguration,
+  overwriteConfiguration,
+  saveConfiguration,
+} from '@/features/editor/api/actions';
 import type { SaveResult } from '@/features/editor/api/save-configuration';
 import {
   useEditorActions,
@@ -19,74 +22,70 @@ export function useSaveConfiguration() {
   const { markSaved, replaceFromServer, setServerErrors, markForCreate } = useEditorActions();
   const dirty = useEditorIsDirty();
   const isNew = useEditorIsNew();
-  const errors = useEditorValidation();
-  const invalid = Object.keys(errors).length > 0;
+  const invalid = Object.keys(useEditorValidation()).length > 0;
   const [conflictOpen, setConflictOpen] = useState(false);
+  const [pending, startTransition] = useTransition();
 
-  function apply(result: SaveResult) {
-    if (result.status === 'saved') {
-      markSaved(result.configuration);
-      setConflictOpen(false);
-      toast.success('Home screen saved');
-      return;
-    }
-    if (result.status === 'conflict') {
-      setConflictOpen(true);
-      return;
-    }
-    if (result.status === 'invalid') {
-      setServerErrors(result.errors);
-      toast.error(result.message);
-      return;
-    }
-    markForCreate();
-    toast.error('The saved screen no longer exists. Save again to create it.');
+  function currentInput() {
+    const { state } = store.getState();
+    return { id: state.id, version: state.version, isNew: state.isNew, data: state.document };
   }
 
-  const save = useMutation({
-    mutationFn: () => saveConfiguration(currentInput()),
-    onSuccess: apply,
-    onError: unavailable,
-  });
+  function apply(result: SaveResult) {
+    switch (result.status) {
+      case 'saved':
+        markSaved(result.configuration);
+        setConflictOpen(false);
+        toast.success('Home screen saved');
+        break;
+      case 'conflict':
+        setConflictOpen(true);
+        break;
+      case 'invalid':
+        setServerErrors(result.errors);
+        toast.error(result.message);
+        break;
+      case 'not_found':
+        markForCreate();
+        toast.error('The saved screen no longer exists. Save again to create it.');
+        break;
+    }
+  }
 
-  const reload = useMutation({
-    mutationFn: () => loadLatestConfiguration(store.getState().state.id),
-    onSuccess(result) {
+  function run(task: () => Promise<void>) {
+    startTransition(async () => {
+      try {
+        await task();
+      } catch {
+        toast.error('The configuration service is unavailable.');
+      }
+    });
+  }
+
+  function saveDraft() {
+    if (invalid) {
+      toast.error('Fix the highlighted fields before saving.');
+      return;
+    }
+    run(async () => apply(await saveConfiguration(currentInput())));
+  }
+
+  function reloadLatest() {
+    run(async () => {
+      const result = await loadLatestConfiguration(store.getState().state.id);
+      setConflictOpen(false);
       if (result.status === 'missing') {
         markForCreate();
         toast.error('The saved screen no longer exists.');
-      } else {
-        replaceFromServer({ configuration: result.configuration, isNew: false });
-        toast.success('Loaded the latest saved screen');
+        return;
       }
-      setConflictOpen(false);
-    },
-    onError: unavailable,
-  });
+      replaceFromServer({ configuration: result.configuration, isNew: false });
+      toast.success('Loaded the latest saved screen');
+    });
+  }
 
-  const overwrite = useMutation({
-    mutationFn: async () => {
-      const latest = await loadLatestConfiguration(store.getState().state.id);
-      const { id, data } = currentInput();
-      if (latest.status === 'missing') {
-        return saveConfiguration({ id, version: 1, isNew: true, data });
-      }
-      return saveConfiguration({
-        id,
-        version: latest.configuration.version,
-        isNew: false,
-        data,
-      });
-    },
-    onSuccess: apply,
-    onError: unavailable,
-  });
-
-  const pending = save.isPending || reload.isPending || overwrite.isPending;
-
-  function currentInput() {
-    const { id, version, isNew: creating, document } = store.getState().state;
-    return { id, version, isNew: creating, data: document };
+  function overwrite() {
+    run(async () => apply(await overwriteConfiguration(currentInput())));
   }
 
   return {
@@ -94,22 +93,8 @@ export function useSaveConfiguration() {
     setConflictOpen,
     pending,
     disabled: pending || invalid || (!dirty && !isNew),
-    saveDraft() {
-      if (invalid) {
-        toast.error('Fix the highlighted fields before saving.');
-        return;
-      }
-      save.mutate();
-    },
-    reloadLatest() {
-      reload.mutate();
-    },
-    overwrite() {
-      overwrite.mutate();
-    },
+    saveDraft,
+    reloadLatest,
+    overwrite,
   };
-}
-
-function unavailable() {
-  toast.error('The configuration service is unavailable.');
 }

@@ -12,6 +12,7 @@ import {
   classifySaveFailure,
   parseSaveInput,
   type LoadLatestResult,
+  type SaveInput,
   type SaveResult,
 } from '@/features/editor/api/save-configuration';
 import type { DraftDocument } from '@/features/editor/store/types';
@@ -20,19 +21,22 @@ export async function saveConfiguration(input: unknown): Promise<SaveResult> {
   const document = draftOf(input);
   const parsed = parseSaveInput(input, document);
   if (!parsed.ok) return parsed.result;
+  return persist(parsed.value, document);
+}
 
-  const client = defaultClient();
-  try {
-    const configuration = parsed.value.isNew
-      ? await client.create({ id: parsed.value.id, data: parsed.value.data })
-      : await client.update(parsed.value.id, {
-          version: parsed.value.version,
-          data: parsed.value.data,
-        });
-    return { status: 'saved', configuration };
-  } catch (error) {
-    return failureResult(error, document);
-  }
+/** Saves the draft over whatever version is stored now, or creates it if it was deleted. */
+export async function overwriteConfiguration(input: unknown): Promise<SaveResult> {
+  const document = draftOf(input);
+  const parsed = parseSaveInput(input, document);
+  if (!parsed.ok) return parsed.result;
+
+  const latest = await loadLatestConfiguration(parsed.value.id);
+  return persist(
+    latest.status === 'missing'
+      ? { ...parsed.value, isNew: true }
+      : { ...parsed.value, isNew: false, version: latest.configuration.version },
+    document,
+  );
 }
 
 export async function loadLatestConfiguration(id: unknown): Promise<LoadLatestResult> {
@@ -44,6 +48,18 @@ export async function loadLatestConfiguration(id: unknown): Promise<LoadLatestRe
   } catch (error) {
     if (error instanceof ConfigServiceError && error.status === 404) return { status: 'missing' };
     throw new Error('The configuration service is unavailable.');
+  }
+}
+
+async function persist(value: SaveInput, document: DraftDocument): Promise<SaveResult> {
+  const client = defaultClient();
+  try {
+    const configuration = value.isNew
+      ? await client.create({ id: value.id, data: value.data })
+      : await client.update(value.id, { version: value.version, data: value.data });
+    return { status: 'saved', configuration };
+  } catch (error) {
+    return failureResult(error, document);
   }
 }
 

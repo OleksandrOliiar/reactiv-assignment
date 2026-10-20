@@ -14,6 +14,7 @@ import { EditorScreen } from './editor-screen';
 
 const saveConfiguration = vi.hoisted(() => vi.fn());
 const loadLatestConfiguration = vi.hoisted(() => vi.fn());
+const overwriteConfiguration = vi.hoisted(() => vi.fn());
 const toast = vi.hoisted(() => ({
   success: vi.fn(),
   error: vi.fn(),
@@ -22,6 +23,7 @@ const toast = vi.hoisted(() => ({
 vi.mock('@/features/editor/api/actions', () => ({
   saveConfiguration,
   loadLatestConfiguration,
+  overwriteConfiguration,
 }));
 
 vi.mock('sonner', () => ({ toast }));
@@ -37,6 +39,7 @@ describe('SaveButton', () => {
   beforeEach(() => {
     saveConfiguration.mockReset();
     loadLatestConfiguration.mockReset();
+    overwriteConfiguration.mockReset();
     toast.success.mockReset();
     toast.error.mockReset();
   });
@@ -128,7 +131,7 @@ describe('SaveButton', () => {
     await user.click(screen.getByRole('button', { name: 'Save' }));
 
     expect(await screen.findByText('This screen was saved somewhere else')).toBeInTheDocument();
-    await user.click(screen.getByRole('button', { name: 'Reload latest' }));
+    await user.click(await screen.findByRole('button', { name: 'Reload latest' }));
 
     await waitFor(() =>
       expect(toast.success).toHaveBeenCalledWith('Loaded the latest saved screen'),

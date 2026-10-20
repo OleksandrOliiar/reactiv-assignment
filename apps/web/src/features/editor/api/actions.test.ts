@@ -16,9 +16,8 @@ vi.mock('@/env', () => ({
 }));
 
 vi.mock('@/features/editor/api/config-service-client', async () => {
-  const actual = await vi.importActual<typeof import('./config-service-client')>(
-    './config-service-client',
-  );
+  const actual =
+    await vi.importActual<typeof import('./config-service-client')>('./config-service-client');
   return {
     ...actual,
     createConfigServiceClient: (): ConfigServiceClient => ({ get, create, update }),
@@ -54,9 +53,7 @@ describe('saveConfiguration action', () => {
       version: 1,
       data: defaultConfigurationData,
     });
-    expect(JSON.stringify(update.mock.calls)).not.toContain(
-      'change-me-to-a-long-random-secret',
-    );
+    expect(JSON.stringify(update.mock.calls)).not.toContain('change-me-to-a-long-random-secret');
   });
 
   it('creates when the draft is marked new', async () => {
@@ -101,6 +98,51 @@ describe('saveConfiguration action', () => {
         data: defaultConfigurationData,
       }),
     ).rejects.toThrow('The configuration service is unavailable.');
+  });
+});
+
+describe('overwriteConfiguration action', () => {
+  beforeEach(() => {
+    get.mockReset();
+    create.mockReset();
+    update.mockReset();
+  });
+
+  it('saves the draft at the version stored now', async () => {
+    const { overwriteConfiguration } = await import('./actions');
+    get.mockResolvedValue({ ...configuration, version: 5 });
+    update.mockResolvedValue({ ...configuration, version: 6 });
+
+    await expect(
+      overwriteConfiguration({
+        id: 'default',
+        version: 2,
+        isNew: false,
+        data: defaultConfigurationData,
+      }),
+    ).resolves.toMatchObject({ status: 'saved' });
+
+    expect(update).toHaveBeenCalledWith('default', {
+      version: 5,
+      data: defaultConfigurationData,
+    });
+  });
+
+  it('creates the screen when it was deleted', async () => {
+    const { overwriteConfiguration } = await import('./actions');
+    get.mockRejectedValue(new ConfigServiceError(404, 'NOT_FOUND', 'Missing'));
+    create.mockResolvedValue(configuration);
+
+    await expect(
+      overwriteConfiguration({
+        id: 'default',
+        version: 2,
+        isNew: false,
+        data: defaultConfigurationData,
+      }),
+    ).resolves.toMatchObject({ status: 'saved' });
+
+    expect(create).toHaveBeenCalledWith({ id: 'default', data: defaultConfigurationData });
   });
 });
 

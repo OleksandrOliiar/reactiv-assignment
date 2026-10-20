@@ -4,6 +4,8 @@ A small editor for a mobile app home screen. The page shows the sections beside 
 
 The screen is one document made of three section types: an image carousel, a text block, and a call-to-action button. Sections can be added, reordered, and removed.
 
+<img width="565" height="435" alt="image" src="https://github.com/user-attachments/assets/f782adbf-c675-4d59-933c-fb16d3da10bf" />
+
 ## Architecture
 
 The browser never sees the API key. Next.js loads and saves on the server, and only the Express service talks to Postgres.

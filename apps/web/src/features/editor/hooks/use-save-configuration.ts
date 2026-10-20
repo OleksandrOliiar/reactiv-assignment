@@ -24,6 +24,7 @@ export function useSaveConfiguration() {
   const [conflictOpen, setConflictOpen] = useState(false);
   const [pending, startTransition] = useTransition();
 
+  /** Read at call time, so overwrite after a conflict sends the draft as it is now. */
   function currentInput() {
     const { state } = store.getState();
     return { id: state.id, version: state.version, isNew: state.isNew, data: state.document };

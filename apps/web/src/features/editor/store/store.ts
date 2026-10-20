@@ -104,6 +104,7 @@ export function createEditorStore({
             });
           },
           addImage(sectionId) {
+            // A valid placeholder so adding an image never makes the draft unsaveable.
             const image = { id: createId(), url: 'https://example.com/image.jpg' };
             edit((state) => {
               findCarousel(state, sectionId)?.images.push(image);

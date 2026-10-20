@@ -48,6 +48,43 @@ describe('save configuration results', () => {
     expect(result.result.errors['cta-1']?.buttonColor).toMatch(/hex color/i);
   });
 
+  it('accepts a valid draft', () => {
+    expect(parseSaveInput({ id: 'default', version: 2, isNew: false, data: document })).toEqual({
+      ok: true,
+      value: { id: 'default', version: 2, isNew: false, data: document },
+    });
+  });
+
+  it('reports a bad id or version as a screen error', () => {
+    const result = parseSaveInput({ id: 'has spaces', version: 0, isNew: false, data: document });
+
+    expect(result).toMatchObject({
+      ok: false,
+      result: {
+        status: 'invalid',
+        errors: { _screen: { id: expect.any(String), version: expect.any(String) } },
+      },
+    });
+  });
+
+  it('maps service validation details onto the draft', () => {
+    expect(
+      classifySaveFailure(
+        {
+          status: 400,
+          code: 'VALIDATION_ERROR',
+          message: 'Request validation failed',
+          details: [{ path: 'body.data.sections.0.url', message: 'Enter an http or https URL' }],
+        },
+        document,
+      ),
+    ).toEqual({
+      status: 'invalid',
+      message: 'Request validation failed',
+      errors: { 'cta-1': { url: 'Enter an http or https URL' } },
+    });
+  });
+
   it('turns a version mismatch into a conflict and a missing record into not found', () => {
     expect(
       classifySaveFailure({ status: 409, code: 'CONFLICT', message: 'Version mismatch' }, document),

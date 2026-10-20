@@ -2,6 +2,10 @@ import type { DraftDocument, FieldErrors } from '@/features/editor/types/types';
 import type { EditorStore } from '@/features/editor/store/types';
 import { validate } from '@/features/editor/store/utils';
 
+/**
+ * Save and discard leave both fields on the same object, so the reference check
+ * is usually enough. The JSON check catches edits typed back to the saved value.
+ */
 export function selectIsDirty({ state }: EditorStore) {
   return (
     state.document !== state.savedDocument &&

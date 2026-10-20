@@ -99,6 +99,16 @@ describe('saveConfiguration action', () => {
       }),
     ).rejects.toThrow('The configuration service is unavailable.');
   });
+
+  it('rejects an invalid draft without calling the service', async () => {
+    const { saveConfiguration } = await import('./actions');
+
+    await expect(
+      saveConfiguration({ id: 'default', version: 1, isNew: false, data: { sections: 'nope' } }),
+    ).resolves.toMatchObject({ status: 'invalid' });
+    expect(update).not.toHaveBeenCalled();
+    expect(create).not.toHaveBeenCalled();
+  });
 });
 
 describe('overwriteConfiguration action', () => {
@@ -156,6 +166,15 @@ describe('loadLatestConfiguration action', () => {
     get.mockResolvedValue(configuration);
 
     await expect(loadLatestConfiguration('default')).resolves.toEqual(configuration);
+  });
+
+  it('refuses an invalid id before calling the service', async () => {
+    const { loadLatestConfiguration } = await import('./actions');
+
+    await expect(loadLatestConfiguration('../etc')).rejects.toThrow(
+      'The configuration id is invalid.',
+    );
+    expect(get).not.toHaveBeenCalled();
   });
 
   it('returns null for a missing configuration', async () => {

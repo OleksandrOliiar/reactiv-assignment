@@ -1,6 +1,8 @@
 import { describe, expect, it } from 'vitest';
 
+import { LIMITS } from './primitives';
 import {
+  configurationDataSchema,
   configurationSchema,
   createConfigurationRequestSchema,
   exportFileSchema,
@@ -50,6 +52,19 @@ describe('configuration schemas', () => {
       data: { sections: [first, first] },
     });
     expect(result.success).toBe(false);
+  });
+
+  it(`accepts up to ${LIMITS.sections} sections`, () => {
+    const [, , cta] = defaultConfigurationData.sections;
+    const sections = (count: number) =>
+      Array.from({ length: count }, (_, index) => ({ ...cta, id: `cta-${index}` }));
+
+    expect(configurationDataSchema.safeParse({ sections: sections(LIMITS.sections) }).success).toBe(
+      true,
+    );
+    expect(
+      configurationDataSchema.safeParse({ sections: sections(LIMITS.sections + 1) }).success,
+    ).toBe(false);
   });
 
   it('accepts an import envelope without validating the payload shape', () => {

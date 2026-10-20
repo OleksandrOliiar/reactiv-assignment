@@ -37,6 +37,7 @@ export function CarouselPreview({ section }: { section: SectionOf<'carousel'> })
                 ASPECT_CLASS[section.aspectRatio],
               )}
             >
+              {/* Keyed by URL so a corrected URL clears the previous load failure. */}
               <SlideImage key={image.url} url={image.url} label={`Carousel image ${index + 1}`} />
             </div>
           </CarouselItem>

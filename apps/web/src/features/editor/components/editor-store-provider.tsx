@@ -26,6 +26,7 @@ export function EditorStoreProvider({
   initial: LoadedConfiguration;
   children: ReactNode;
 }) {
+  // One store per mount. A module-level store would be shared across requests during SSR.
   const [store] = useState(() => createEditorStore({ initial }));
 
   return <EditorStoreContext.Provider value={store}>{children}</EditorStoreContext.Provider>;

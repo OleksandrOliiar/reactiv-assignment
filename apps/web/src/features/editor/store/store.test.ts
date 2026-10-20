@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest';
 
 import type { LoadedConfiguration, SectionOf } from '../types/types';
 import { createEditorStore } from './store';
-import { selectIsDirty, selectValidation } from './selectors';
+import { selectHasErrors, selectIsDirty, selectValidation } from './selectors';
 
 function textSection(): SectionOf<'text'> {
   const text = defaultConfigurationData.sections.find(
@@ -123,5 +123,105 @@ describe('editor store', () => {
     expect(editor.getState().state.isNew).toBe(false);
     expect(editor.getState().state.version).toBe(4);
     expect(selectIsDirty(editor.getState())).toBe(false);
+  });
+
+  it('keeps the open section across a save, or opens the first one if it is gone', () => {
+    const editor = store();
+    editor.getState().actions.selectSection('welcome-cta');
+    editor.getState().actions.markSaved({ ...configuration, version: 4 });
+    expect(editor.getState().state.selectedSectionId).toBe('welcome-cta');
+
+    editor.getState().actions.markSaved({
+      ...configuration,
+      version: 5,
+      data: { sections: defaultConfigurationData.sections.slice(0, 2) },
+    });
+    expect(editor.getState().state.selectedSectionId).toBe('welcome-carousel');
+  });
+
+  it('is not dirty when an edit is typed back to the saved value', () => {
+    const editor = store();
+    const text = textSection();
+    editor.getState().actions.updateSection(text, { title: { ...text.title, text: 'Hello' } });
+    editor.getState().actions.updateSection(text, { title: text.title });
+
+    expect(selectIsDirty(editor.getState())).toBe(false);
+  });
+
+  it('gives a duplicated carousel fresh image ids', () => {
+    const editor = store();
+    editor.getState().actions.duplicateSection('welcome-carousel');
+
+    const copy = editor.getState().state.document.sections[1];
+    expect(copy).toMatchObject({ id: 'id-1', type: 'carousel' });
+    if (copy?.type !== 'carousel') return;
+    expect(copy.images.map((image) => image.id)).toEqual(['id-2', 'id-3']);
+    expect(selectValidation(editor.getState())).toEqual({});
+  });
+
+  it('opens the first remaining section when the open one is removed', () => {
+    const editor = store();
+    editor.getState().actions.selectSection('welcome-text');
+    editor.getState().actions.removeSection('welcome-text');
+    expect(editor.getState().state.selectedSectionId).toBe('welcome-carousel');
+
+    editor.getState().actions.selectSection('welcome-cta');
+    editor.getState().actions.removeSection('welcome-carousel');
+    expect(editor.getState().state.selectedSectionId).toBe('welcome-cta');
+  });
+
+  it('adds, edits, moves, and removes carousel images', () => {
+    const editor = store();
+    const { addImage, updateImage, moveImage, removeImage } = editor.getState().actions;
+    const images = () => {
+      const carousel = editor.getState().state.document.sections[0];
+      return carousel?.type === 'carousel' ? carousel.images : [];
+    };
+
+    addImage('welcome-carousel');
+    expect(images().map((image) => image.id)).toEqual([
+      'welcome-carousel-1',
+      'welcome-carousel-2',
+      'id-1',
+    ]);
+
+    updateImage('welcome-carousel', 'id-1', { url: 'https://example.com/new.jpg' });
+    expect(images()[2]?.url).toBe('https://example.com/new.jpg');
+
+    moveImage('welcome-carousel', 'id-1', 'up');
+    expect(images()[1]?.id).toBe('id-1');
+
+    removeImage('welcome-carousel', 'welcome-carousel-1');
+    expect(images().map((image) => image.id)).toEqual(['id-1', 'welcome-carousel-2']);
+  });
+
+  it('ignores image actions aimed at a section that is not a carousel', () => {
+    const editor = store();
+    const before = editor.getState().state.document;
+    editor.getState().actions.addImage('welcome-text');
+
+    expect(editor.getState().state.document).toEqual(before);
+  });
+
+  it('replaces the draft with an imported document', () => {
+    const editor = store();
+    const imported = { sections: defaultConfigurationData.sections.slice(2) };
+    editor.getState().actions.replaceDocument(imported);
+
+    expect(editor.getState().state.document).toEqual(imported);
+    expect(editor.getState().state.selectedSectionId).toBe('welcome-cta');
+    expect(selectIsDirty(editor.getState())).toBe(true);
+  });
+
+  it('drops server errors on discard and marks a missing screen for creation', () => {
+    const editor = store();
+    const text = textSection();
+    editor.getState().actions.updateSection(text, { title: { ...text.title, text: 'Hello' } });
+    editor.getState().actions.setServerErrors({ [text.id]: { 'title.text': 'Rejected' } });
+    editor.getState().actions.discardChanges();
+    editor.getState().actions.markForCreate();
+
+    expect(selectHasErrors(editor.getState())).toBe(false);
+    expect(editor.getState().state.isNew).toBe(true);
   });
 });

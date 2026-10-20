@@ -24,6 +24,7 @@ type EditorActions = {
   removeSection: (id: string) => void;
   moveSection: (id: string, direction: 'up' | 'down') => void;
   reorderSection: (id: string, overId: string) => void;
+  /** Shallow merge: nested values such as a text block must be passed whole. */
   updateSection: <T extends DraftSection>(
     section: T,
     patch: Partial<Omit<T, 'id' | 'type'>>,

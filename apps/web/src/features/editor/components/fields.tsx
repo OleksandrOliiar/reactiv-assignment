@@ -109,6 +109,7 @@ export function ColorField({
             aria-label={`${label} picker`}
             value={pickerValue}
             className="size-6 cursor-pointer p-0.5"
+            // The addon focuses the text input on click, which would close the native picker.
             onClick={(event) => event.stopPropagation()}
             onChange={(event) => onChange(event.target.value)}
           />

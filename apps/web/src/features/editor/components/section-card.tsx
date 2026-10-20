@@ -34,6 +34,7 @@ export function SectionCard({ section, index, count, errors }: SectionCardProps)
     isDragging,
   } = useSortable({ id: section.id });
 
+  /** Arrow keys move through the store; see `SectionList` for why dnd-kit's keyboard sensor is off. */
   function handleKeyDown(event: React.KeyboardEvent<HTMLButtonElement>) {
     if (event.key !== 'ArrowUp' && event.key !== 'ArrowDown') {
       return;
@@ -64,6 +65,8 @@ export function SectionCard({ section, index, count, errors }: SectionCardProps)
       open={selected}
       onOpenChange={(open) => selectSection(open ? section.id : null)}
     >
+      {/* The trigger covers the whole row so any click toggles the card. Buttons cannot nest,
+          so the drag handle and the menu are siblings layered above it with z-10. */}
       <div className="relative flex min-h-16 items-center gap-2 p-2">
         <CollapsibleTrigger asChild>
           <Button

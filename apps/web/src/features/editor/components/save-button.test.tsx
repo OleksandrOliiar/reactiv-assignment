@@ -138,4 +138,75 @@ describe('SaveButton', () => {
     expect(screen.getByRole('button', { name: /^2\.\s*Welcome home/ })).toBeInTheDocument();
     expect(screen.queryByText('This screen was saved somewhere else')).not.toBeInTheDocument();
   });
+
+  it('overwrites from the conflict dialog', async () => {
+    const user = userEvent.setup();
+    saveConfiguration.mockResolvedValue({ status: 'conflict', message: 'Version mismatch' });
+    overwriteConfiguration.mockResolvedValue({
+      status: 'saved',
+      configuration: { ...savedConfiguration, version: 7 },
+    });
+
+    renderEditor(<EditorScreen />, { initial: loadedConfiguration });
+    await editWelcomeTitle(user, 'Mine wins');
+    await user.click(screen.getByRole('button', { name: 'Save' }));
+    await user.click(await screen.findByRole('button', { name: 'Overwrite' }));
+
+    await waitFor(() => expect(toast.success).toHaveBeenCalledWith('Home screen saved'));
+    expect(overwriteConfiguration).toHaveBeenCalledWith(
+      expect.objectContaining({ id: 'default', version: 3, isNew: false }),
+    );
+    expect(screen.getByText('Version 7')).toBeInTheDocument();
+  });
+
+  it('switches to create mode when the saved screen was deleted', async () => {
+    const user = userEvent.setup();
+    saveConfiguration.mockResolvedValue({ status: 'not_found', message: 'Missing' });
+
+    renderEditor(<EditorScreen />, { initial: loadedConfiguration });
+    await editWelcomeTitle(user, 'Orphan');
+    await user.click(screen.getByRole('button', { name: 'Save' }));
+
+    await waitFor(() =>
+      expect(toast.error).toHaveBeenCalledWith(
+        'The saved screen no longer exists. Save again to create it.',
+      ),
+    );
+    saveConfiguration.mockResolvedValue({ status: 'saved', configuration: savedConfiguration });
+    await user.click(screen.getByRole('button', { name: 'Save' }));
+    await waitFor(() =>
+      expect(saveConfiguration).toHaveBeenLastCalledWith(expect.objectContaining({ isNew: true })),
+    );
+  });
+
+  it('reports an unavailable service and keeps the draft', async () => {
+    const user = userEvent.setup();
+    saveConfiguration.mockRejectedValue(new Error('down'));
+
+    renderEditor(<EditorScreen />, { initial: loadedConfiguration });
+    await editWelcomeTitle(user, 'Still here');
+    await user.click(screen.getByRole('button', { name: 'Save' }));
+
+    await waitFor(() =>
+      expect(toast.error).toHaveBeenCalledWith('The configuration service is unavailable.'),
+    );
+    expect(screen.getByText('Unsaved changes')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Save' })).toBeEnabled();
+  });
+
+  it('marks the draft for creation when reload finds nothing', async () => {
+    const user = userEvent.setup();
+    saveConfiguration.mockResolvedValue({ status: 'conflict', message: 'Version mismatch' });
+    loadLatestConfiguration.mockResolvedValue(null);
+
+    renderEditor(<EditorScreen />, { initial: loadedConfiguration });
+    await editWelcomeTitle(user, 'Lonely');
+    await user.click(screen.getByRole('button', { name: 'Save' }));
+    await user.click(await screen.findByRole('button', { name: 'Reload latest' }));
+
+    await waitFor(() =>
+      expect(toast.error).toHaveBeenCalledWith('The saved screen no longer exists.'),
+    );
+    expect(screen.getByRole('textbox', { name: 'Title' })).toHaveValue('Lonely');
+  });
 });

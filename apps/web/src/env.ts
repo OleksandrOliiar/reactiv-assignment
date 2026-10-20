@@ -6,6 +6,8 @@ import { entityIdSchema } from '@reactiv/contracts';
 import { createEnv } from '@t3-oss/env-nextjs';
 import { z } from 'zod';
 
+// `next dev` runs in apps/web, but the shared .env lives at the repo root.
+// `loadEnvFile` never overrides variables that are already set.
 const rootEnvPath = path.resolve(process.cwd(), '..', '..', '.env');
 if (existsSync(rootEnvPath)) {
   loadEnvFile(rootEnvPath);

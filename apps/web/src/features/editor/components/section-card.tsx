@@ -57,7 +57,7 @@ export function SectionCard({ section, index, count, errors }: SectionCardProps)
         transition,
       }}
       className={cn(
-        'rounded-xl border bg-card shadow-xs transition-[border-color,box-shadow]',
+        'group rounded-xl border bg-card shadow-xs transition-[border-color,box-shadow]',
         selected ? 'border-primary/30 shadow-sm' : 'hover:border-primary/25 hover:shadow-sm',
         errorCount > 0 && !selected && 'border-destructive/40',
         isDragging && 'relative z-10 opacity-90 shadow-lg',
@@ -82,7 +82,7 @@ export function SectionCard({ section, index, count, errors }: SectionCardProps)
                 'flex size-9 shrink-0 items-center justify-center rounded-lg transition-colors',
                 selected
                   ? 'bg-primary text-primary-foreground'
-                  : 'bg-accent text-accent-foreground',
+                  : 'bg-accent text-accent-foreground group-hover:bg-primary group-hover:text-primary-foreground',
               )}
             >
               <Icon />

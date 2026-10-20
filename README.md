@@ -73,7 +73,7 @@ Without Docker, create a Postgres 17 database and set `DATABASE_URL` in `.env`. 
 
 ## Environment
 
-One `.env` at the repository root. The API reads it from the process working directory. The web app reads the same file from the repo root.
+One `.env` at the repository root. The API and the web app both read that file, including when a script starts inside `apps/api` or `apps/web`. A variable already set in the environment is left as it is.
 
 ### Configuration service
 

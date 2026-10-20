@@ -1,3 +1,6 @@
+import { existsSync } from 'node:fs';
+import path from 'node:path';
+
 import { entityIdSchema } from '@reactiv/contracts';
 import { z } from 'zod';
 
@@ -40,15 +43,12 @@ export function loadEnvOrExit(source: NodeJS.ProcessEnv = process.env): Env {
   }
 }
 
-function loadDotEnvFile(): void {
-  try {
-    process.loadEnvFile();
-  } catch (error) {
-    if (isMissingFile(error)) return;
-    throw error;
+/** Load the package `.env`, then the repo root `.env`. Existing variables stay as they are. */
+export function loadDotEnvFile(): void {
+  for (const file of [
+    path.resolve(process.cwd(), '.env'),
+    path.resolve(process.cwd(), '..', '..', '.env'),
+  ]) {
+    if (existsSync(file)) process.loadEnvFile(file);
   }
-}
-
-function isMissingFile(error: unknown): boolean {
-  return error instanceof Error && 'code' in error && error.code === 'ENOENT';
 }

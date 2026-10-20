@@ -1,7 +1,14 @@
-import { configurationDataSchema } from '@reactiv/contracts';
+import { configurationDataSchema, type ErrorDetail } from '@reactiv/contracts';
+import type { ZodError } from 'zod';
 
-import type { DraftSection, SectionType } from '@/features/editor/types/types';
-import type { DraftDocument, EditorStore, FieldErrors } from '@/features/editor/store/types';
+import type {
+  DraftDocument,
+  DraftSection,
+  FieldErrors,
+  SectionOf,
+  SectionType,
+} from '@/features/editor/types/types';
+import type { EditorState } from '@/features/editor/store/types';
 
 export function createSection(type: SectionType, createId: () => string): DraftSection {
   const id = createId();
@@ -37,10 +44,11 @@ export function duplicateSection(section: DraftSection, createId: () => string):
   return { ...structuredClone(section), id: createId() };
 }
 
-export function serverDetailsToFieldErrors(
-  document: DraftDocument,
-  details: { path: string; message: string }[],
-): FieldErrors {
+/**
+ * Groups error details by the section that owns them. Paths may carry a prefix,
+ * such as `body.data.sections.0.url` from the API.
+ */
+export function detailsToFieldErrors(document: DraftDocument, details: ErrorDetail[]): FieldErrors {
   const errors: FieldErrors = {};
   for (const detail of details) {
     const parts = detail.path.split('.');
@@ -59,28 +67,19 @@ export function serverDetailsToFieldErrors(
   return errors;
 }
 
-export function validate(document: DraftDocument): FieldErrors {
-  const parsed = configurationDataSchema.safeParse(document);
-  if (parsed.success) return {};
-
-  const errors: FieldErrors = {};
-  for (const issue of parsed.error.issues) {
-    const [head, index, ...rest] = issue.path;
-    const section =
-      head === 'sections' && typeof index === 'number' ? document.sections[index] : undefined;
-    const sectionKey = section?.id ?? '_screen';
-    const field = section
-      ? rest.map(String).join('.') || 'section'
-      : issue.path.map(String).join('.') || 'screen';
-    const fields = errors[sectionKey] ?? {};
-    if (!fields[field]) fields[field] = issue.message;
-    errors[sectionKey] = fields;
-  }
-  return errors;
+export function issuesToFieldErrors(
+  document: DraftDocument,
+  issues: ZodError['issues'],
+): FieldErrors {
+  return detailsToFieldErrors(
+    document,
+    issues.map((issue) => ({ path: issue.path.map(String).join('.'), message: issue.message })),
+  );
 }
 
-export function clampIndex(index: number, length: number): number {
-  return Math.min(Math.max(index, 0), length);
+export function validate(document: DraftDocument): FieldErrors {
+  const parsed = configurationDataSchema.safeParse(document);
+  return parsed.success ? {} : issuesToFieldErrors(document, parsed.error.issues);
 }
 
 export function moveById<T extends { id: string }>(
@@ -99,10 +98,11 @@ export function moveById<T extends { id: string }>(
   return next;
 }
 
-type CarouselSection = Extract<DraftSection, { type: 'carousel' }>;
-
-export function findCarousel(store: EditorStore, sectionId: string): CarouselSection | undefined {
-  return store.state.document.sections.find((section): section is CarouselSection => {
+export function findCarousel(
+  state: EditorState,
+  sectionId: string,
+): SectionOf<'carousel'> | undefined {
+  return state.document.sections.find((section): section is SectionOf<'carousel'> => {
     return section.type === 'carousel' && section.id === sectionId;
   });
 }

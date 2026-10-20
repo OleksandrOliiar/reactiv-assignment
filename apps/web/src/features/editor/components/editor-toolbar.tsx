@@ -1,5 +1,3 @@
-'use client';
-
 import { Smartphone } from 'lucide-react';
 import { useState } from 'react';
 
@@ -33,7 +31,7 @@ export function EditorToolbar() {
         </div>
 
         <div className="order-last flex w-full items-center gap-2 sm:order-0 sm:w-auto [&>button]:flex-auto sm:[&>button]:flex-none">
-          <ImportExportMenu onFailure={setImportError} onImported={() => setImportError(null)} />
+          <ImportExportMenu onImportError={setImportError} />
           <DiscardChangesDialog />
         </div>
 

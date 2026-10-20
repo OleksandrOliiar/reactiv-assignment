@@ -12,7 +12,7 @@ import {
 } from '@/shared/ui/carousel';
 import { Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from '@/shared/ui/empty';
 
-import type { DraftSection } from '../types/types';
+import type { SectionOf } from '../types/types';
 import { SlideImage } from './slide-image';
 
 const ASPECT_CLASS: Record<AspectRatio, string> = {
@@ -21,11 +21,7 @@ const ASPECT_CLASS: Record<AspectRatio, string> = {
   square: 'aspect-square',
 };
 
-export function CarouselPreview({
-  section,
-}: {
-  section: Extract<DraftSection, { type: 'carousel' }>;
-}) {
+export function CarouselPreview({ section }: { section: SectionOf<'carousel'> }) {
   if (section.images.length === 0) {
     return <NoImagesMessage />;
   }

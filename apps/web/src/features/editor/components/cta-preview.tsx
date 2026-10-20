@@ -1,13 +1,12 @@
-'use client';
-
 import { httpUrlSchema } from '@reactiv/contracts';
 
 import { Alert, AlertDescription } from '@/shared/ui/alert';
 import { Button } from '@/shared/ui/button';
-import type { DraftSection } from '../types/types';
+
+import type { SectionOf } from '../types/types';
 import { safeHexColor } from '../utils/utils';
 
-export function CtaPreview({ section }: { section: Extract<DraftSection, { type: 'cta' }> }) {
+export function CtaPreview({ section }: { section: SectionOf<'cta'> }) {
   const buttonColor = safeHexColor(section.buttonColor);
   const labelColor = safeHexColor(section.labelColor);
   const style = {

@@ -1,7 +1,5 @@
-'use client';
-
 import { Download, FileJson, Upload } from 'lucide-react';
-import { useRef } from 'react';
+import { useRef, type ChangeEvent } from 'react';
 import { toast } from 'sonner';
 
 import { Button } from '@/shared/ui/button';
@@ -12,29 +10,24 @@ import {
   DropdownMenuTrigger,
 } from '@/shared/ui/dropdown-menu';
 
-import { useEditorActions, useEditorStoreApi, useEditorValidation } from './editor-store-provider';
+import { useEditorActions, useEditorHasErrors, useEditorStoreApi } from './editor-store-provider';
 import {
   createExportFile,
   downloadExport,
-  INVALID_JSON,
-  isImportTooLarge,
-  parseImportText,
+  readImportFile,
   type ImportFailure,
 } from '../utils/utils';
 
+/** `onImportError` receives null after a successful import. */
 export function ImportExportMenu({
-  onFailure,
-  onImported,
+  onImportError,
 }: {
-  onFailure: (error: ImportFailure) => void;
-  onImported: () => void;
+  onImportError: (error: ImportFailure | null) => void;
 }) {
   const store = useEditorStoreApi();
   const { replaceDocument } = useEditorActions();
-
+  const hasErrors = useEditorHasErrors();
   const fileInput = useRef<HTMLInputElement>(null);
-
-  const isInvalid = Object.keys(useEditorValidation()).length > 0;
 
   function exportDraft() {
     const file = createExportFile(store.getState().state.document);
@@ -44,42 +37,21 @@ export function ImportExportMenu({
   }
 
   async function importFile(file: File) {
-    const isOversized = isImportTooLarge(file.size);
-    if (isOversized) {
-      onFailure(isOversized);
+    const result = await readImportFile(file);
+    if (!result.ok) {
+      onImportError(result.error);
       return;
     }
-
-    let text: string;
-    try {
-      text = await file.text();
-    } catch {
-      onFailure({ status: 'invalid_json', message: INVALID_JSON });
-      return;
-    }
-
-    const result = parseImportText(text);
-    if (result.status !== 'imported') {
-      onFailure(result);
-      return;
-    }
-
     replaceDocument(result.data);
-    onImported();
+    onImportError(null);
     toast.success('Imported the home screen. Save to keep it.');
   }
 
-  function handleInputChange(event: React.ChangeEvent<HTMLInputElement>) {
+  function handleInputChange(event: ChangeEvent<HTMLInputElement>) {
     const file = event.currentTarget.files?.[0];
+    // Cleared so picking the same file again still fires `change`.
     event.currentTarget.value = '';
     if (file) void importFile(file);
-  }
-
-  function handleImportClick() {
-    const input = fileInput.current;
-    if (!input) return;
-    input.value = '';
-    input.click();
   }
 
   return (
@@ -100,11 +72,11 @@ export function ImportExportMenu({
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
-          <DropdownMenuItem disabled={isInvalid} onSelect={exportDraft}>
+          <DropdownMenuItem disabled={hasErrors} onSelect={exportDraft}>
             <Download />
             Export JSON
           </DropdownMenuItem>
-          <DropdownMenuItem onSelect={handleImportClick}>
+          <DropdownMenuItem onSelect={() => fileInput.current?.click()}>
             <Upload />
             Import JSON
           </DropdownMenuItem>

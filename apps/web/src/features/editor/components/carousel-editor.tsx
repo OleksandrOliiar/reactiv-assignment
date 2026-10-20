@@ -1,12 +1,10 @@
-'use client';
-
 import { LIMITS } from '@reactiv/contracts';
 
 import { Alert, AlertDescription } from '@/shared/ui/alert';
 import { Empty, EmptyDescription, EmptyHeader, EmptyTitle } from '@/shared/ui/empty';
 import { Field, FieldError, FieldLabel, FieldLegend, FieldSet } from '@/shared/ui/field';
 
-import type { DraftSection, SectionErrors } from '../types/types';
+import type { SectionErrors, SectionOf } from '../types/types';
 import { AddImageButton } from './add-image-button';
 import { AspectRatioSelect } from './aspect-ratio-select';
 import { ImageCard } from './image-card';
@@ -15,18 +13,16 @@ export function CarouselEditor({
   section,
   errors,
 }: {
-  section: Extract<DraftSection, { type: 'carousel' }>;
+  section: SectionOf<'carousel'>;
   errors: SectionErrors;
 }) {
+  const aspectId = `${section.id}-aspect`;
+
   return (
     <div className="flex flex-col gap-6">
       <Field data-invalid={Boolean(errors.aspectRatio) || undefined}>
-        <FieldLabel htmlFor={`${section.id}-aspect`}>Aspect ratio</FieldLabel>
-        <AspectRatioSelect
-          sectionId={section.id}
-          currentValue={section.aspectRatio}
-          errors={errors}
-        />
+        <FieldLabel htmlFor={aspectId}>Aspect ratio</FieldLabel>
+        <AspectRatioSelect id={aspectId} section={section} invalid={Boolean(errors.aspectRatio)} />
         <FieldError>{errors.aspectRatio}</FieldError>
       </Field>
       <FieldSet className="gap-3">
@@ -58,7 +54,7 @@ export function CarouselEditor({
             <AlertDescription>{errors.images}</AlertDescription>
           </Alert>
         ) : null}
-        <AddImageButton sectionId={section.id} sectionImagesLength={section.images.length} />
+        <AddImageButton sectionId={section.id} imageCount={section.images.length} />
       </FieldSet>
     </div>
   );

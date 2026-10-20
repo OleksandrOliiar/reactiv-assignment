@@ -1,5 +1,5 @@
-import { ReactNode } from "react";
-import { cn } from "@/shared/lib/utils";
+import { ReactNode } from 'react';
+import { cn } from '@/shared/lib/utils';
 
 export function PanelHeading({
   title,

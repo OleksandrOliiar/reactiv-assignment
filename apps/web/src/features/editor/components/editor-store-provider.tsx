@@ -6,12 +6,13 @@ import { useStore } from 'zustand';
 import type { LoadedConfiguration } from '../types/types';
 import {
   selectActions,
+  selectHasErrors,
   selectIsDirty,
+  selectIsNew,
+  selectSections,
   selectSelectedSectionId,
   selectValidation,
   selectVersion,
-  selectIsNew,
-  selectSections,
 } from '../store/selectors';
 import { createEditorStore, type EditorStoreApi } from '../store/store';
 import type { EditorStore } from '../store/types';
@@ -32,11 +33,11 @@ export function EditorStoreProvider({
 
 export function useEditorStoreApi(): EditorStoreApi {
   const store = useContext(EditorStoreContext);
-  if (!store) throw new Error('useEditorStore must be used within EditorStoreProvider');
+  if (!store) throw new Error('useEditorStoreApi must be used within EditorStoreProvider');
   return store;
 }
 
-export function useEditorStore<T>(selector: (store: EditorStore) => T): T {
+function useEditorStore<T>(selector: (store: EditorStore) => T): T {
   return useStore(useEditorStoreApi(), selector);
 }
 
@@ -46,6 +47,10 @@ export function useEditorIsDirty() {
 
 export function useEditorValidation() {
   return useEditorStore(selectValidation);
+}
+
+export function useEditorHasErrors() {
+  return useEditorStore(selectHasErrors);
 }
 
 export function useEditorActions() {

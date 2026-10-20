@@ -1,8 +1,6 @@
-'use client';
-
 import { LIMITS } from '@reactiv/contracts';
 
-import type { DraftSection, SectionErrors } from '../types/types';
+import type { SectionErrors, SectionOf } from '../types/types';
 import { useEditorActions } from './editor-store-provider';
 import { ColorField, TextField, UrlField } from './fields';
 
@@ -10,18 +8,10 @@ export function CtaEditor({
   section,
   errors,
 }: {
-  section: Extract<DraftSection, { type: 'cta' }>;
+  section: SectionOf<'cta'>;
   errors: SectionErrors;
 }) {
   const { updateSection } = useEditorActions();
-
-  function update(
-    patch: Partial<Pick<typeof section, 'label' | 'url' | 'buttonColor' | 'labelColor'>>,
-  ) {
-    updateSection(section.id, (current) =>
-      current.type === 'cta' ? { ...current, ...patch } : current,
-    );
-  }
 
   return (
     <div className="grid gap-5 sm:grid-cols-2 sm:gap-x-4">
@@ -31,28 +21,28 @@ export function CtaEditor({
         value={section.label}
         maxLength={LIMITS.buttonLabel}
         error={errors.label}
-        onChange={(label) => update({ label })}
+        onChange={(label) => updateSection(section, { label })}
       />
       <UrlField
         id={`${section.id}-url`}
         label="Button URL"
         value={section.url}
         error={errors.url}
-        onChange={(url) => update({ url })}
+        onChange={(url) => updateSection(section, { url })}
       />
       <ColorField
         id={`${section.id}-button-color`}
         label="Button color"
         value={section.buttonColor}
         error={errors.buttonColor}
-        onChange={(buttonColor) => update({ buttonColor })}
+        onChange={(buttonColor) => updateSection(section, { buttonColor })}
       />
       <ColorField
         id={`${section.id}-label-color`}
         label="Label color"
         value={section.labelColor}
         error={errors.labelColor}
-        onChange={(labelColor) => update({ labelColor })}
+        onChange={(labelColor) => updateSection(section, { labelColor })}
       />
     </div>
   );

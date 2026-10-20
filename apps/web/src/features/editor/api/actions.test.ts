@@ -155,18 +155,22 @@ describe('loadLatestConfiguration action', () => {
     const { loadLatestConfiguration } = await import('./actions');
     get.mockResolvedValue(configuration);
 
-    await expect(loadLatestConfiguration('default')).resolves.toEqual({
-      status: 'loaded',
-      configuration,
-    });
+    await expect(loadLatestConfiguration('default')).resolves.toEqual(configuration);
   });
 
-  it('reports a missing configuration without leaking the API key', async () => {
+  it('returns null for a missing configuration', async () => {
     const { loadLatestConfiguration } = await import('./actions');
     get.mockRejectedValue(new ConfigServiceError(404, 'NOT_FOUND', 'Missing'));
 
-    const result = await loadLatestConfiguration('default');
-    expect(result).toEqual({ status: 'missing' });
-    expect(JSON.stringify(result)).not.toContain('change-me-to-a-long-random-secret');
+    await expect(loadLatestConfiguration('default')).resolves.toBeNull();
+  });
+
+  it('hides other failures behind a plain error', async () => {
+    const { loadLatestConfiguration } = await import('./actions');
+    get.mockRejectedValue(new ConfigServiceError(503, 'INTERNAL', 'Down'));
+
+    await expect(loadLatestConfiguration('default')).rejects.toThrow(
+      'The configuration service is unavailable.',
+    );
   });
 });

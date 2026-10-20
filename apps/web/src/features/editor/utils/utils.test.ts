@@ -1,7 +1,7 @@
 import { CURRENT_SCHEMA_VERSION, defaultConfigurationData } from '@reactiv/contracts';
 import { describe, expect, it } from 'vitest';
 
-import { MAX_IMPORT_BYTES, createExportFile, isImportTooLarge, parseImportText } from './utils';
+import { MAX_IMPORT_BYTES, createExportFile, parseImportText, readImportFile } from './utils';
 
 const exportedAt = '2026-01-01T00:00:00.000Z';
 
@@ -32,34 +32,53 @@ describe('parseImportText', () => {
   it('returns the screen from a current export', () => {
     const exported = createExportFile(defaultConfigurationData, exportedAt);
     expect(parseImportText(JSON.stringify(exported))).toEqual({
-      status: 'imported',
+      ok: true,
       data: defaultConfigurationData,
     });
   });
 
   it('reports malformed JSON', () => {
-    expect(parseImportText('{')).toMatchObject({ status: 'invalid_json' });
+    expect(parseImportText('{')).toMatchObject({
+      ok: false,
+      error: { title: 'Could not read this file' },
+    });
   });
 
   it('reports a schema version this app cannot upgrade', () => {
-    const result = parseImportText(file({ sections: [] }, CURRENT_SCHEMA_VERSION + 1));
-    expect(result.status).toBe('unsupported_version');
+    expect(parseImportText(file({ sections: [] }, CURRENT_SCHEMA_VERSION + 1))).toMatchObject({
+      ok: false,
+      error: { title: 'Unsupported file version' },
+    });
   });
 
   it('reports a file that is JSON but not a home screen', () => {
     expect(parseImportText('[]')).toEqual({
-      status: 'invalid_shape',
-      message: 'This file does not match a home screen export.',
+      ok: false,
+      error: {
+        title: 'This file is not a valid home screen',
+        message: 'This file does not match a home screen export.',
+      },
     });
-    const shape = parseImportText(file({ sections: [{ type: 'text' }] }));
-    expect(shape.status).toBe('invalid_shape');
-    if (shape.status === 'invalid_shape') expect(shape.message).toContain('sections.0');
+    expect(parseImportText(file({ sections: [{ type: 'text' }] }))).toMatchObject({
+      ok: false,
+      error: { message: expect.stringContaining('sections.0') },
+    });
   });
 });
 
-describe('importTooLarge', () => {
-  it('accepts a file at the limit and rejects anything larger', () => {
-    expect(isImportTooLarge(MAX_IMPORT_BYTES)).toBeNull();
-    expect(isImportTooLarge(MAX_IMPORT_BYTES + 1)).toMatchObject({ status: 'too_large' });
+describe('readImportFile', () => {
+  it('parses the file contents', async () => {
+    const text = JSON.stringify(createExportFile(defaultConfigurationData, exportedAt));
+    await expect(readImportFile(new File([text], 'screen.json'))).resolves.toMatchObject({
+      ok: true,
+    });
+  });
+
+  it('rejects a file over the size limit before reading it', async () => {
+    const big = new File([new Uint8Array(MAX_IMPORT_BYTES + 1)], 'big.json');
+    await expect(readImportFile(big)).resolves.toMatchObject({
+      ok: false,
+      error: { title: 'This file is too large' },
+    });
   });
 });

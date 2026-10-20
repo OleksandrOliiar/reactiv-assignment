@@ -6,8 +6,8 @@ import {
 } from '@reactiv/contracts';
 import { z } from 'zod';
 
-import { serverDetailsToFieldErrors } from '@/features/editor/store/utils';
-import type { DraftDocument, FieldErrors } from '@/features/editor/store/types';
+import { detailsToFieldErrors, issuesToFieldErrors } from '@/features/editor/store/utils';
+import type { DraftDocument, FieldErrors } from '@/features/editor/types/types';
 
 export type SaveInput = {
   id: string;
@@ -22,9 +22,6 @@ export type SaveResult =
   | { status: 'conflict'; message: string }
   | { status: 'not_found'; message: string };
 
-export type LoadLatestResult =
-  { status: 'loaded'; configuration: Configuration } | { status: 'missing' };
-
 const saveInputSchema = z.object({
   id: entityIdSchema,
   version: z.number().int().positive({ error: 'Version must be a positive integer' }),
@@ -34,23 +31,24 @@ const saveInputSchema = z.object({
 
 export function parseSaveInput(
   input: unknown,
-  document: DraftDocument,
 ): { ok: true; value: SaveInput } | { ok: false; result: SaveResult } {
   const parsed = saveInputSchema.safeParse(input);
   if (parsed.success) return { ok: true, value: parsed.data };
 
-  const details = parsed.error.issues.map((issue) => ({
-    path: issue.path.map(String).join('.'),
-    message: issue.message,
-  }));
   return {
     ok: false,
     result: {
       status: 'invalid',
       message: 'The screen is not valid yet.',
-      errors: serverDetailsToFieldErrors(document, details),
+      errors: issuesToFieldErrors(draftOf(input), parsed.error.issues),
     },
   };
+}
+
+/** Enough of an unparsed draft to map issue paths back to section ids. */
+function draftOf(input: unknown): DraftDocument {
+  const sections = (input as { data?: { sections?: unknown } } | null)?.data?.sections;
+  return { sections: Array.isArray(sections) ? sections : [] };
 }
 
 type ServiceFailure = {
@@ -75,7 +73,7 @@ export function classifySaveFailure(
     return {
       status: 'invalid',
       message: failure.message,
-      errors: serverDetailsToFieldErrors(document, failure.details ?? []),
+      errors: detailsToFieldErrors(document, failure.details ?? []),
     };
   }
   return null;

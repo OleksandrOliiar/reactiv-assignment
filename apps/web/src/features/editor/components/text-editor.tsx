@@ -1,26 +1,21 @@
-'use client';
+import { LIMITS, type TextBlock } from '@reactiv/contracts';
 
-import { LIMITS } from '@reactiv/contracts';
-
-import type { DraftSection } from '../types/types';
-import { ColorField, TextField } from '../components/fields';
-import type { SectionErrors } from '../types/types';
-import { useEditorActions } from '../components/editor-store-provider';
+import type { SectionErrors, SectionOf } from '../types/types';
+import { useEditorActions } from './editor-store-provider';
+import { ColorField, TextField } from './fields';
 
 export function TextEditor({
   section,
   errors,
 }: {
-  section: Extract<DraftSection, { type: 'text' }>;
+  section: SectionOf<'text'>;
   errors: SectionErrors;
 }) {
   const { updateSection } = useEditorActions();
 
-  function updateBlock(block: 'title' | 'description', key: 'text' | 'color', value: string) {
-    updateSection(section.id, (current) => {
-      if (current.type !== 'text') return current;
-      return { ...current, [block]: { ...current[block], [key]: value } };
-    });
+  function updateBlock(block: 'title' | 'description', patch: Partial<TextBlock>) {
+    const next = { ...section[block], ...patch };
+    updateSection(section, block === 'title' ? { title: next } : { description: next });
   }
 
   return (
@@ -31,14 +26,14 @@ export function TextEditor({
         value={section.title.text}
         maxLength={LIMITS.title}
         error={errors['title.text']}
-        onChange={(value) => updateBlock('title', 'text', value)}
+        onChange={(text) => updateBlock('title', { text })}
       />
       <ColorField
         id={`${section.id}-title-color`}
         label="Title color"
         value={section.title.color}
         error={errors['title.color']}
-        onChange={(value) => updateBlock('title', 'color', value)}
+        onChange={(color) => updateBlock('title', { color })}
       />
       <TextField
         id={`${section.id}-description`}
@@ -47,14 +42,14 @@ export function TextEditor({
         maxLength={LIMITS.description}
         multiline
         error={errors['description.text']}
-        onChange={(value) => updateBlock('description', 'text', value)}
+        onChange={(text) => updateBlock('description', { text })}
       />
       <ColorField
         id={`${section.id}-description-color`}
         label="Description color"
         value={section.description.color}
         error={errors['description.color']}
-        onChange={(value) => updateBlock('description', 'color', value)}
+        onChange={(color) => updateBlock('description', { color })}
       />
     </div>
   );

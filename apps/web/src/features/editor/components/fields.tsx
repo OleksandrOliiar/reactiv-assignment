@@ -1,5 +1,3 @@
-'use client';
-
 import { LIMITS } from '@reactiv/contracts';
 
 import { Field, FieldError, FieldLabel } from '@/shared/ui/field';

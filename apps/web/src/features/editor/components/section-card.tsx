@@ -1,5 +1,3 @@
-'use client';
-
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { ChevronDown, GripVertical } from 'lucide-react';
@@ -8,15 +6,13 @@ import { cn } from '@/shared/lib/utils';
 import { Badge } from '@/shared/ui/badge';
 import { Button } from '@/shared/ui/button';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/shared/ui/collapsible';
-
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/shared/ui/tooltip';
 
-import { useEditorActions, useEditorSelectedSectionId } from './editor-store-provider';
+import type { DraftSection, SectionErrors } from '../types/types';
 import { sectionTitle } from '../utils/utils';
-import { DraftSection } from '../types/types';
-import { SectionEditor, sectionRegistry } from './sections-registry';
-import type { SectionErrors } from '../types/types';
+import { useEditorActions, useEditorSelectedSectionId } from './editor-store-provider';
 import { SectionMenu } from './section-menu';
+import { SectionEditor, sectionRegistry } from './sections-registry';
 
 type SectionCardProps = {
   section: DraftSection;
@@ -37,6 +33,15 @@ export function SectionCard({ section, index, count, errors }: SectionCardProps)
     transition,
     isDragging,
   } = useSortable({ id: section.id });
+
+  function handleKeyDown(event: React.KeyboardEvent<HTMLButtonElement>) {
+    if (event.key !== 'ArrowUp' && event.key !== 'ArrowDown') {
+      return;
+    }
+
+    event.preventDefault();
+    moveSection(section.id, event.key === 'ArrowUp' ? 'up' : 'down');
+  }
 
   const definition = sectionRegistry[section.type];
   const Icon = definition.icon;
@@ -111,14 +116,7 @@ export function SectionCard({ section, index, count, errors }: SectionCardProps)
               {...listeners}
               aria-label={`Reorder ${title}`}
               aria-roledescription="sortable"
-              onKeyDown={(event) => {
-                if (event.key !== 'ArrowUp' && event.key !== 'ArrowDown') {
-                  return;
-                }
-
-                event.preventDefault();
-                moveSection(section.id, event.key === 'ArrowUp' ? 'up' : 'down');
-              }}
+              onKeyDown={handleKeyDown}
             >
               <GripVertical />
             </Button>

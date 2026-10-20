@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest';
 
 import { classifySaveFailure, parseSaveInput } from '@/features/editor/api/save-configuration';
-import { serverDetailsToFieldErrors } from '@/features/editor/store/utils';
-import type { DraftDocument } from '@/features/editor/store/types';
+import { detailsToFieldErrors } from '@/features/editor/store/utils';
+import type { DraftDocument } from '@/features/editor/types/types';
 
 const document: DraftDocument = {
   sections: [
@@ -20,7 +20,7 @@ const document: DraftDocument = {
 describe('save configuration results', () => {
   it('maps a service validation path onto the section that owns it', () => {
     expect(
-      serverDetailsToFieldErrors(document, [
+      detailsToFieldErrors(document, [
         {
           path: 'body.data.sections.0.buttonColor',
           message: 'Enter a hex color like #RGB or #RRGGBB',
@@ -32,17 +32,14 @@ describe('save configuration results', () => {
   });
 
   it('rejects a draft the shared schema does not accept', () => {
-    const result = parseSaveInput(
-      {
-        id: 'default',
-        version: 1,
-        isNew: false,
-        data: {
-          sections: [{ ...document.sections[0], buttonColor: 'red' }],
-        },
+    const result = parseSaveInput({
+      id: 'default',
+      version: 1,
+      isNew: false,
+      data: {
+        sections: [{ ...document.sections[0], buttonColor: 'red' }],
       },
-      document,
-    );
+    });
 
     expect(result.ok).toBe(false);
     if (result.ok) return;

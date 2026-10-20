@@ -1,5 +1,3 @@
-'use client';
-
 import { useState, useTransition } from 'react';
 import { toast } from 'sonner';
 
@@ -11,18 +9,18 @@ import {
 import type { SaveResult } from '@/features/editor/api/save-configuration';
 import {
   useEditorActions,
+  useEditorHasErrors,
   useEditorIsDirty,
   useEditorIsNew,
   useEditorStoreApi,
-  useEditorValidation,
 } from '@/features/editor/components/editor-store-provider';
 
 export function useSaveConfiguration() {
   const store = useEditorStoreApi();
-  const { markSaved, replaceFromServer, setServerErrors, markForCreate } = useEditorActions();
+  const { markSaved, setServerErrors, markForCreate } = useEditorActions();
   const dirty = useEditorIsDirty();
   const isNew = useEditorIsNew();
-  const invalid = Object.keys(useEditorValidation()).length > 0;
+  const hasErrors = useEditorHasErrors();
   const [conflictOpen, setConflictOpen] = useState(false);
   const [pending, startTransition] = useTransition();
 
@@ -63,23 +61,19 @@ export function useSaveConfiguration() {
   }
 
   function saveDraft() {
-    if (invalid) {
-      toast.error('Fix the highlighted fields before saving.');
-      return;
-    }
     run(async () => apply(await saveConfiguration(currentInput())));
   }
 
   function reloadLatest() {
     run(async () => {
-      const result = await loadLatestConfiguration(store.getState().state.id);
+      const latest = await loadLatestConfiguration(store.getState().state.id);
       setConflictOpen(false);
-      if (result.status === 'missing') {
+      if (!latest) {
         markForCreate();
         toast.error('The saved screen no longer exists.');
         return;
       }
-      replaceFromServer({ configuration: result.configuration, isNew: false });
+      markSaved(latest);
       toast.success('Loaded the latest saved screen');
     });
   }
@@ -92,7 +86,7 @@ export function useSaveConfiguration() {
     conflictOpen,
     setConflictOpen,
     pending,
-    disabled: pending || invalid || (!dirty && !isNew),
+    disabled: pending || hasErrors || (!dirty && !isNew),
     saveDraft,
     reloadLatest,
     overwrite,

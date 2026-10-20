@@ -1,94 +1,60 @@
 'use server';
 
-import { entityIdSchema } from '@reactiv/contracts';
+import { entityIdSchema, type Configuration } from '@reactiv/contracts';
 
-import { env } from '@/env';
-import {
-  ConfigServiceError,
-  createConfigServiceClient,
-  type ConfigServiceClient,
-} from '@/features/editor/api/config-service-client';
+import { ConfigServiceError } from '@/features/editor/api/config-service-client';
+import { configServiceClient, findConfiguration } from '@/features/editor/api/load-configuration';
 import {
   classifySaveFailure,
   parseSaveInput,
-  type LoadLatestResult,
   type SaveInput,
   type SaveResult,
 } from '@/features/editor/api/save-configuration';
-import type { DraftDocument } from '@/features/editor/store/types';
+
+const UNAVAILABLE = 'The configuration service is unavailable.';
 
 export async function saveConfiguration(input: unknown): Promise<SaveResult> {
-  const document = draftOf(input);
-  const parsed = parseSaveInput(input, document);
+  const parsed = parseSaveInput(input);
   if (!parsed.ok) return parsed.result;
-  return persist(parsed.value, document);
+  return persist(parsed.value);
 }
 
 /** Saves the draft over whatever version is stored now, or creates it if it was deleted. */
 export async function overwriteConfiguration(input: unknown): Promise<SaveResult> {
-  const document = draftOf(input);
-  const parsed = parseSaveInput(input, document);
+  const parsed = parseSaveInput(input);
   if (!parsed.ok) return parsed.result;
 
   const latest = await loadLatestConfiguration(parsed.value.id);
   return persist(
-    latest.status === 'missing'
-      ? { ...parsed.value, isNew: true }
-      : { ...parsed.value, isNew: false, version: latest.configuration.version },
-    document,
+    latest
+      ? { ...parsed.value, isNew: false, version: latest.version }
+      : { ...parsed.value, isNew: true },
   );
 }
 
-export async function loadLatestConfiguration(id: unknown): Promise<LoadLatestResult> {
+/** The stored configuration, or null when it no longer exists. */
+export async function loadLatestConfiguration(id: unknown): Promise<Configuration | null> {
   const parsed = entityIdSchema.safeParse(id);
   if (!parsed.success) throw new Error('The configuration id is invalid.');
 
   try {
-    return { status: 'loaded', configuration: await defaultClient().get(parsed.data) };
-  } catch (error) {
-    if (error instanceof ConfigServiceError && error.status === 404) return { status: 'missing' };
-    throw new Error('The configuration service is unavailable.');
+    return await findConfiguration(parsed.data);
+  } catch {
+    throw new Error(UNAVAILABLE);
   }
 }
 
-async function persist(value: SaveInput, document: DraftDocument): Promise<SaveResult> {
-  const client = defaultClient();
+async function persist(value: SaveInput): Promise<SaveResult> {
+  const client = configServiceClient();
   try {
     const configuration = value.isNew
       ? await client.create({ id: value.id, data: value.data })
       : await client.update(value.id, { version: value.version, data: value.data });
     return { status: 'saved', configuration };
   } catch (error) {
-    return failureResult(error, document);
+    const result =
+      error instanceof ConfigServiceError ? classifySaveFailure(error, value.data) : null;
+    if (result) return result;
+    throw new Error(UNAVAILABLE);
   }
-}
-
-function failureResult(error: unknown, document: DraftDocument): SaveResult {
-  if (error instanceof ConfigServiceError) {
-    const classified = classifySaveFailure(error, document);
-    if (classified) return classified;
-  }
-  throw new Error('The configuration service is unavailable.');
-}
-
-function draftOf(input: unknown): DraftDocument {
-  if (typeof input === 'object' && input !== null && 'data' in input) {
-    const data = input.data;
-    if (
-      typeof data === 'object' &&
-      data !== null &&
-      'sections' in data &&
-      Array.isArray(data.sections)
-    ) {
-      return { sections: data.sections };
-    }
-  }
-  return { sections: [] };
-}
-
-function defaultClient(): ConfigServiceClient {
-  return createConfigServiceClient({
-    baseUrl: env.CONFIG_SERVICE_URL,
-    apiKey: env.CONFIG_SERVICE_API_KEY,
-  });
 }

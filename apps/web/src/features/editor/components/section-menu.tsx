@@ -27,7 +27,6 @@ export function SectionMenu({
 
   return (
     <>
-      {' '}
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button type="button" variant="ghost" size="icon-sm" aria-label={`Actions for ${title}`}>

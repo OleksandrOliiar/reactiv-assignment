@@ -1,5 +1,3 @@
-'use client';
-
 import { Save } from 'lucide-react';
 
 import { useSaveConfiguration } from '@/features/editor/hooks/use-save-configuration';

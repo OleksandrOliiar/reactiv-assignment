@@ -1,11 +1,10 @@
-'use client';
-
 import { BatteryFull, Signal, Smartphone, Wifi } from 'lucide-react';
 
 import { Card } from '@/shared/ui/card';
 import { Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from '@/shared/ui/empty';
 import { ScrollArea } from '@/shared/ui/scroll-area';
-import { useEditorSections } from '../components/editor-store-provider';
+
+import { useEditorSections } from './editor-store-provider';
 import { SectionPreview } from './sections-registry';
 
 export function PhonePreview() {

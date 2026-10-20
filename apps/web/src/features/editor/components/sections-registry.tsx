@@ -1,16 +1,13 @@
-'use client';
+import { GalleryHorizontal, MousePointerClick, Type, type LucideIcon } from 'lucide-react';
+import type { ComponentType } from 'react';
 
-import { GalleryHorizontal, LucideIcon, MousePointerClick, Type } from 'lucide-react';
-
-import type { DraftSection, SectionType } from '../types/types';
+import type { DraftSection, SectionErrors, SectionOf, SectionType } from '../types/types';
 import { CarouselEditor } from './carousel-editor';
 import { CarouselPreview } from './carousel-preview';
 import { CtaEditor } from './cta-editor';
 import { CtaPreview } from './cta-preview';
 import { TextEditor } from './text-editor';
 import { TextPreview } from './text-preview';
-import { ComponentType } from 'react';
-import type { SectionErrors } from '../types/types';
 
 type SectionDefinition<T extends DraftSection> = {
   type: T['type'];
@@ -42,7 +39,7 @@ export const sectionRegistry = {
     Editor: CtaEditor,
     Preview: CtaPreview,
   },
-} as const satisfies { [K in SectionType]: SectionDefinition<Extract<DraftSection, { type: K }>> };
+} as const satisfies { [K in SectionType]: SectionDefinition<SectionOf<K>> };
 
 export function SectionEditor({
   section,

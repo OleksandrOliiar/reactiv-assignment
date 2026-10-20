@@ -1,9 +1,17 @@
 import { defaultConfigurationData, type Configuration } from '@reactiv/contracts';
 import { describe, expect, it } from 'vitest';
 
-import type { LoadedConfiguration } from '../types/types';
+import type { LoadedConfiguration, SectionOf } from '../types/types';
 import { createEditorStore } from './store';
 import { selectIsDirty, selectValidation } from './selectors';
+
+function textSection(): SectionOf<'text'> {
+  const text = defaultConfigurationData.sections.find(
+    (section): section is SectionOf<'text'> => section.type === 'text',
+  );
+  if (!text) throw new Error('The default screen has no text section');
+  return text;
+}
 
 const configuration: Configuration = {
   id: 'default',
@@ -37,12 +45,8 @@ describe('editor store', () => {
 
   it('tracks edits and restores them on discard', () => {
     const editor = store();
-    const textId = defaultConfigurationData.sections[1]?.id;
-    expect(textId).toBeTruthy();
-    editor.getState().actions.updateSection(textId ?? '', (section) => {
-      if (section.type !== 'text') return section;
-      return { ...section, title: { ...section.title, text: 'Hello' } };
-    });
+    const text = textSection();
+    editor.getState().actions.updateSection(text, { title: { ...text.title, text: 'Hello' } });
     expect(selectIsDirty(editor.getState())).toBe(true);
 
     editor.getState().actions.discardChanges();
@@ -54,15 +58,15 @@ describe('editor store', () => {
 
   it('adds, duplicates, reorders, and removes sections', () => {
     const editor = store();
-    editor.getState().actions.addSection('text', 0);
-    expect(editor.getState().state.document.sections[0]?.id).toBe('id-1');
+    editor.getState().actions.addSection('text');
+    expect(editor.getState().state.document.sections.at(-1)?.id).toBe('id-1');
     expect(editor.getState().state.selectedSectionId).toBe('id-1');
 
     editor.getState().actions.duplicateSection('id-1');
-    expect(editor.getState().state.document.sections[1]?.id).toBe('id-2');
+    expect(editor.getState().state.document.sections.at(-1)?.id).toBe('id-2');
 
     editor.getState().actions.moveSection('id-2', 'up');
-    expect(editor.getState().state.document.sections[0]?.id).toBe('id-2');
+    expect(editor.getState().state.document.sections.at(-2)?.id).toBe('id-2');
 
     editor.getState().actions.removeSection('id-2');
     expect(editor.getState().state.document.sections.some((section) => section.id === 'id-2')).toBe(
@@ -83,36 +87,28 @@ describe('editor store', () => {
 
   it('maps invalid draft values to the section that owns them', () => {
     const editor = store();
-    const textId =
-      defaultConfigurationData.sections.find((section) => section.type === 'text')?.id ?? '';
-    editor.getState().actions.updateSection(textId, (section) => {
-      if (section.type !== 'text') return section;
-      return { ...section, title: { ...section.title, color: 'red' } };
-    });
+    const text = textSection();
+    editor.getState().actions.updateSection(text, { title: { ...text.title, color: 'red' } });
 
-    expect(selectValidation(editor.getState())[textId]?.['title.color']).toMatch(/hex color/i);
+    expect(selectValidation(editor.getState())[text.id]?.['title.color']).toMatch(/hex color/i);
     expect(selectValidation(editor.getState())).toBe(selectValidation(editor.getState()));
     expect(selectIsDirty(editor.getState())).toBe(true);
   });
 
   it('shows server field errors until the draft changes', () => {
     const editor = store();
-    const textId =
-      defaultConfigurationData.sections.find((section) => section.type === 'text')?.id ?? '';
+    const text = textSection();
     editor.getState().actions.setServerErrors({
-      [textId]: { 'title.color': 'Rejected by the configuration service' },
+      [text.id]: { 'title.color': 'Rejected by the configuration service' },
     });
 
-    expect(selectValidation(editor.getState())[textId]?.['title.color']).toMatch(
+    expect(selectValidation(editor.getState())[text.id]?.['title.color']).toMatch(
       /configuration service/,
     );
     expect(selectValidation(editor.getState())).toBe(selectValidation(editor.getState()));
 
-    editor.getState().actions.updateSection(textId, (section) => {
-      if (section.type !== 'text') return section;
-      return { ...section, title: { ...section.title, text: 'Hello' } };
-    });
-    expect(selectValidation(editor.getState())[textId]?.['title.color']).toBeUndefined();
+    editor.getState().actions.updateSection(text, { title: { ...text.title, text: 'Hello' } });
+    expect(selectValidation(editor.getState())[text.id]?.['title.color']).toBeUndefined();
   });
 
   it('marks a save as the new clean snapshot', () => {

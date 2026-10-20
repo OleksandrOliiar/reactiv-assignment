@@ -1,10 +1,9 @@
-'use client';
-
 import { Card, CardDescription, CardHeader, CardTitle } from '@/shared/ui/card';
-import type { DraftSection } from '../types/types';
+
+import type { SectionOf } from '../types/types';
 import { safeHexColor } from '../utils/utils';
 
-export function TextPreview({ section }: { section: Extract<DraftSection, { type: 'text' }> }) {
+export function TextPreview({ section }: { section: SectionOf<'text'> }) {
   const titleColor = safeHexColor(section.title.color);
   const descriptionColor = safeHexColor(section.description.color);
 

@@ -1,16 +1,16 @@
-import { hexColorSchema } from '@reactiv/contracts';
 import {
   CURRENT_SCHEMA_VERSION,
   UnsupportedSchemaVersionError,
   configurationDataSchema,
+  hexColorSchema,
   importFileEnvelopeSchema,
   migrateConfigurationData,
+  type ConfigurationData,
+  type ExportFile,
 } from '@reactiv/contracts';
-import type { ConfigurationData, ExportFile } from '@reactiv/contracts';
 import type { ZodError } from 'zod';
 
-import type { DraftDocument } from '@/features/editor/store/types';
-import type { DraftSection } from '../types/types';
+import type { DraftDocument, DraftSection } from '../types/types';
 
 export function sectionTitle(section: DraftSection): string {
   if (section.type === 'text') return section.title.text || 'Untitled text';
@@ -32,23 +32,6 @@ export function safeHexColor(value: string): string | undefined {
   return parsed.data;
 }
 
-/** A home screen export is a small JSON document. Reject anything larger. */
-export const MAX_IMPORT_BYTES = 1_048_576;
-
-export type ImportFailureStatus =
-  'invalid_json' | 'unsupported_version' | 'invalid_shape' | 'too_large';
-
-export type ImportFailure = {
-  status: ImportFailureStatus;
-  message: string;
-};
-
-export type ImportResult = { status: 'imported'; data: ConfigurationData } | ImportFailure;
-
-export const INVALID_JSON = 'This file is not valid JSON.';
-const TOO_LARGE = 'Import files must be 1 MB or smaller.';
-const INVALID_SHAPE = 'This file does not match a home screen export.';
-
 export function createExportFile(
   document: DraftDocument,
   exportedAt = new Date().toISOString(),
@@ -63,46 +46,59 @@ export function createExportFile(
   };
 }
 
-export function isImportTooLarge(bytes: number): ImportFailure | null {
-  if (bytes <= MAX_IMPORT_BYTES) return null;
-  return { status: 'too_large', message: TOO_LARGE };
+/** A home screen export is a small JSON document. Reject anything larger. */
+export const MAX_IMPORT_BYTES = 1_048_576;
+
+export type ImportFailure = { title: string; message: string };
+export type ImportResult =
+  { ok: true; data: ConfigurationData } | { ok: false; error: ImportFailure };
+
+function failure(title: string, message: string): ImportResult {
+  return { ok: false, error: { title, message } };
+}
+
+const unreadable = () => failure('Could not read this file', 'This file is not valid JSON.');
+
+export async function readImportFile(file: File): Promise<ImportResult> {
+  if (file.size > MAX_IMPORT_BYTES) {
+    return failure('This file is too large', 'Import files must be 1 MB or smaller.');
+  }
+  const text = await file.text().catch(() => null);
+  return text === null ? unreadable() : parseImportText(text);
 }
 
 export function parseImportText(text: string): ImportResult {
-  let json;
+  let json: unknown;
   try {
     json = JSON.parse(text);
   } catch {
-    return { status: 'invalid_json', message: INVALID_JSON };
+    return unreadable();
   }
 
   const envelope = importFileEnvelopeSchema.safeParse(json);
-  if (!envelope.success) {
-    return { status: 'invalid_shape', message: issueMessage(envelope.error) };
-  }
+  if (!envelope.success) return invalidShape(envelope.error);
 
-  let migrated;
+  let migrated: unknown;
   try {
     migrated = migrateConfigurationData(envelope.data.data, envelope.data.schemaVersion);
   } catch (error) {
     if (error instanceof UnsupportedSchemaVersionError) {
-      return { status: 'unsupported_version', message: error.message };
+      return failure('Unsupported file version', error.message);
     }
     throw error;
   }
 
   const data = configurationDataSchema.safeParse(migrated);
-  if (!data.success) {
-    return { status: 'invalid_shape', message: issueMessage(data.error) };
-  }
-
-  return { status: 'imported', data: data.data };
+  return data.success ? { ok: true, data: data.data } : invalidShape(data.error);
 }
 
-function issueMessage(error: ZodError): string {
+function invalidShape(error: ZodError): ImportResult {
   const issue = error.issues[0];
-  if (!issue || issue.path.length === 0) return INVALID_SHAPE;
-  return `${issue.path.map(String).join('.')}: ${issue.message}`;
+  const message =
+    issue && issue.path.length > 0
+      ? `${issue.path.map(String).join('.')}: ${issue.message}`
+      : 'This file does not match a home screen export.';
+  return failure('This file is not a valid home screen', message);
 }
 
 export function downloadExport(file: ExportFile) {

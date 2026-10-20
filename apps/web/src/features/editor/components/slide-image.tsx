@@ -1,5 +1,3 @@
-'use client';
-
 import { Empty, EmptyMedia, EmptyHeader, EmptyDescription, EmptyTitle } from '@/shared/ui/empty';
 import { httpUrlSchema } from '@reactiv/contracts';
 import { ImageOff } from 'lucide-react';

@@ -2,9 +2,10 @@ import { ChevronDown, ChevronUp, Trash2 } from 'lucide-react';
 
 import { Button } from '@/shared/ui/button';
 import { Card, CardAction, CardContent, CardHeader, CardTitle } from '@/shared/ui/card';
-import { UrlField } from './fields';
+
+import type { DraftImage, SectionErrors } from '../types/types';
 import { useEditorActions } from './editor-store-provider';
-import { DraftImage, SectionErrors } from '../types/types';
+import { UrlField } from './fields';
 
 export function ImageCard({
   index,
@@ -64,12 +65,7 @@ export function ImageCard({
           label="Image URL"
           value={image.url}
           error={errors[`images.${index}.url`]}
-          onChange={(url) =>
-            updateImage(sectionId, image.id, (current) => ({
-              ...current,
-              url,
-            }))
-          }
+          onChange={(url) => updateImage(sectionId, image.id, { url })}
         />
       </CardContent>
     </Card>

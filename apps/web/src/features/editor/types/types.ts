@@ -1,37 +1,19 @@
-import type { AspectRatio, Configuration } from '@reactiv/contracts';
+import type { CarouselImage, Configuration, ConfigurationData, Section } from '@reactiv/contracts';
 
 export type LoadedConfiguration = {
   configuration: Configuration;
   isNew: boolean;
 };
 
-export type DraftImage = {
-  id: string;
-  url: string;
-};
-
-export type DraftSection =
-  | {
-      id: string;
-      type: 'carousel';
-      aspectRatio: AspectRatio;
-      images: DraftImage[];
-    }
-  | {
-      id: string;
-      type: 'text';
-      title: { text: string; color: string };
-      description: { text: string; color: string };
-    }
-  | {
-      id: string;
-      type: 'cta';
-      label: string;
-      url: string;
-      buttonColor: string;
-      labelColor: string;
-    };
+/** Drafts have the contract shapes, but their values are not validated yet. */
+export type DraftDocument = ConfigurationData;
+export type DraftSection = Section;
+export type DraftImage = CarouselImage;
 
 export type SectionType = DraftSection['type'];
+export type SectionOf<T extends SectionType> = Extract<DraftSection, { type: T }>;
 
+/** Messages keyed by field path, e.g. `title.color` or `images.0.url`. */
 export type SectionErrors = Record<string, string>;
+/** Section errors keyed by section id. Screen-level errors use `_screen`. */
+export type FieldErrors = Record<string, SectionErrors>;

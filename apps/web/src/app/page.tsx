@@ -1,29 +1,13 @@
 import { env } from '@/env';
-import {
-  ConfigServiceError,
-  loadConfiguration,
-  EditorScreen,
-  EditorStoreProvider,
-} from '@/features/editor';
+import { EditorScreen, EditorStoreProvider, loadConfiguration } from '@/features/editor';
 
 export const dynamic = 'force-dynamic';
 
 export default async function HomePage() {
-  const loaded = await loadHomeScreen();
+  const loaded = await loadConfiguration(env.DEFAULT_CONFIG_ID);
   return (
     <EditorStoreProvider initial={loaded}>
       <EditorScreen />
     </EditorStoreProvider>
   );
-}
-
-async function loadHomeScreen() {
-  try {
-    return await loadConfiguration(env.DEFAULT_CONFIG_ID);
-  } catch (error) {
-    if (error instanceof ConfigServiceError) {
-      throw new Error('The configuration service is unavailable.');
-    }
-    throw error;
-  }
 }

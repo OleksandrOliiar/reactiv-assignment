@@ -1,10 +1,12 @@
-import type { DraftDocument, EditorStore, FieldErrors } from '@/features/editor/store/types';
+import type { DraftDocument, FieldErrors } from '@/features/editor/types/types';
+import type { EditorStore } from '@/features/editor/store/types';
 import { validate } from '@/features/editor/store/utils';
 
-export type { FieldErrors };
-
-export function selectIsDirty(store: EditorStore) {
-  return JSON.stringify(store.state.document) !== JSON.stringify(store.state.savedDocument);
+export function selectIsDirty({ state }: EditorStore) {
+  return (
+    state.document !== state.savedDocument &&
+    JSON.stringify(state.document) !== JSON.stringify(state.savedDocument)
+  );
 }
 
 const validationCache = new WeakMap<DraftDocument, FieldErrors>();
@@ -36,6 +38,10 @@ function documentValidation(document: DraftDocument): FieldErrors {
   const errors = validate(document);
   validationCache.set(document, errors);
   return errors;
+}
+
+export function selectHasErrors(store: EditorStore) {
+  return Object.keys(selectValidation(store)).length > 0;
 }
 
 export function selectActions(store: EditorStore) {

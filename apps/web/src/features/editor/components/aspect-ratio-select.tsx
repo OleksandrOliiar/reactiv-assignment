@@ -1,9 +1,9 @@
-'use client';
+import { ASPECT_RATIOS, type AspectRatio } from '@reactiv/contracts';
 
-import { ASPECT_RATIOS, AspectRatio } from '@reactiv/contracts';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/shared/ui/select';
+
+import type { SectionOf } from '../types/types';
 import { useEditorActions } from './editor-store-provider';
-import { SectionErrors } from '../types/types';
 
 const ASPECT_LABELS: Record<AspectRatio, string> = {
   portrait: 'Portrait',
@@ -12,30 +12,23 @@ const ASPECT_LABELS: Record<AspectRatio, string> = {
 };
 
 export function AspectRatioSelect({
-  sectionId,
-  currentValue,
-  errors,
+  id,
+  section,
+  invalid,
 }: {
-  sectionId: string;
-  currentValue: AspectRatio;
-  errors: SectionErrors;
+  id: string;
+  section: SectionOf<'carousel'>;
+  invalid: boolean;
 }) {
   const { updateSection } = useEditorActions();
 
-  function handleAspectRatioChange(value: string) {
-    updateSection(sectionId, (current) =>
-      current.type === 'carousel' ? { ...current, aspectRatio: value as AspectRatio } : current,
-    );
-  }
-
   return (
-    <Select value={currentValue} onValueChange={handleAspectRatioChange}>
-      <SelectTrigger
-        id={`${sectionId}-aspect`}
-        className="w-full"
-        aria-invalid={Boolean(errors.aspectRatio)}
-      >
-        <SelectValue>{ASPECT_LABELS[currentValue]}</SelectValue>
+    <Select
+      value={section.aspectRatio}
+      onValueChange={(value) => updateSection(section, { aspectRatio: value as AspectRatio })}
+    >
+      <SelectTrigger id={id} className="w-full" aria-invalid={invalid}>
+        <SelectValue>{ASPECT_LABELS[section.aspectRatio]}</SelectValue>
       </SelectTrigger>
       <SelectContent>
         {ASPECT_RATIOS.map((ratio) => (

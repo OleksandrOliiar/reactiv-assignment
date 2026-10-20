@@ -121,10 +121,9 @@ describe('SaveButton', () => {
       status: 'conflict',
       message: 'Version mismatch',
     });
-    loadLatestConfiguration.mockResolvedValue({
-      status: 'loaded',
-      configuration: createDefaultConfiguration('default', '2026-02-01T00:00:00.000Z'),
-    });
+    loadLatestConfiguration.mockResolvedValue(
+      createDefaultConfiguration('default', '2026-02-01T00:00:00.000Z'),
+    );
 
     renderEditor(<EditorScreen />, { initial: loadedConfiguration });
     await editWelcomeTitle(user, 'Stale draft');

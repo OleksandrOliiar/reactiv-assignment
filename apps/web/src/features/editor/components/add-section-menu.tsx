@@ -9,7 +9,7 @@ import {
   DropdownMenuTrigger,
 } from '@/shared/ui/dropdown-menu';
 import { useEditorActions, useEditorSections } from './editor-store-provider';
-import { sectionRegistry } from './sections-registry';
+import { sectionRegistry } from './sections/registry';
 
 export function AddSectionMenu() {
   const { addSection } = useEditorActions();

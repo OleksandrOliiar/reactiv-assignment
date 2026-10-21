@@ -11,7 +11,7 @@ import {
 } from '@/shared/ui/alert-dialog';
 import { Button } from '@/shared/ui/button';
 import { Undo2 } from 'lucide-react';
-import { useEditorActions, useEditorIsDirty } from './editor-store-provider';
+import { useEditorActions, useEditorIsDirty } from '../editor-store-provider';
 
 export function DiscardChangesDialog() {
   const dirty = useEditorIsDirty();

@@ -10,7 +10,7 @@ import { loadedConfiguration, savedConfiguration } from '@/test/fixtures';
 
 import { SaveButton } from './save-button';
 import { EditorStatus } from './editor-status';
-import { EditorScreen } from './editor-screen';
+import { EditorScreen } from '../editor-screen';
 
 const saveConfiguration = vi.hoisted(() => vi.fn());
 const loadLatestConfiguration = vi.hoisted(() => vi.fn());

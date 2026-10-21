@@ -4,7 +4,7 @@ import { Alert, AlertDescription } from '@/shared/ui/alert';
 import { Empty, EmptyDescription, EmptyHeader, EmptyTitle } from '@/shared/ui/empty';
 import { Field, FieldError, FieldLabel, FieldLegend, FieldSet } from '@/shared/ui/field';
 
-import type { SectionErrors, SectionOf } from '../types/types';
+import type { SectionErrors, SectionOf } from '../../types/types';
 import { AddImageButton } from './add-image-button';
 import { AspectRatioSelect } from './aspect-ratio-select';
 import { ImageCard } from './image-card';

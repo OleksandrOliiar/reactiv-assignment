@@ -10,13 +10,13 @@ import {
   DropdownMenuTrigger,
 } from '@/shared/ui/dropdown-menu';
 
-import { useEditorActions, useEditorHasErrors, useEditorStoreApi } from './editor-store-provider';
+import { useEditorActions, useEditorHasErrors, useEditorStoreApi } from '../editor-store-provider';
 import {
   createExportFile,
   downloadExport,
   readImportFile,
   type ImportFailure,
-} from '../utils/utils';
+} from '../../utils/utils';
 
 /** `onImportError` receives null after a successful import. */
 export function ImportExportMenu({

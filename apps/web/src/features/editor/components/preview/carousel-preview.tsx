@@ -12,7 +12,7 @@ import {
 } from '@/shared/ui/carousel';
 import { Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from '@/shared/ui/empty';
 
-import type { SectionOf } from '../types/types';
+import type { SectionOf } from '../../types/types';
 import { SlideImage } from './slide-image';
 
 const ASPECT_CLASS: Record<AspectRatio, string> = {

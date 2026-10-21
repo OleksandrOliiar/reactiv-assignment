@@ -1,7 +1,7 @@
 import { Card, CardDescription, CardHeader, CardTitle } from '@/shared/ui/card';
 
-import type { SectionOf } from '../types/types';
-import { safeHexColor } from '../utils/utils';
+import type { SectionOf } from '../../types/types';
+import { safeHexColor } from '../../utils/utils';
 
 export function TextPreview({ section }: { section: SectionOf<'text'> }) {
   const titleColor = safeHexColor(section.title.color);

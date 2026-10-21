@@ -8,7 +8,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/shared/ui/dropdown-menu';
-import { useEditorActions } from './editor-store-provider';
+import { useEditorActions } from '../editor-store-provider';
 import { DeleteSectionDialog } from './delete-section-dialog';
 
 export function SectionMenu({

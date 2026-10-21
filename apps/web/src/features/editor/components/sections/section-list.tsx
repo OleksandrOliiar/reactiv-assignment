@@ -13,8 +13,8 @@ import { LayoutList } from 'lucide-react';
 
 import { Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from '@/shared/ui/empty';
 
-import { sectionTitle } from '../utils/utils';
-import { useEditorActions, useEditorSections, useEditorValidation } from './editor-store-provider';
+import { sectionTitle } from '../../utils/utils';
+import { useEditorActions, useEditorSections, useEditorValidation } from '../editor-store-provider';
 import { SectionCard } from './section-card';
 
 const SCREEN_READER_INSTRUCTIONS =

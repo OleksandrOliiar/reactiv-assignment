@@ -8,7 +8,7 @@ import {
   AlertDialogFooter,
   AlertDialogAction,
 } from '@/shared/ui/alert-dialog';
-import { useEditorActions } from './editor-store-provider';
+import { useEditorActions } from '../editor-store-provider';
 
 export function DeleteSectionDialog({
   sectionId,

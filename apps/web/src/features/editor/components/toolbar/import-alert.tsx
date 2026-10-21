@@ -3,7 +3,7 @@ import { AlertCircleIcon, X } from 'lucide-react';
 import { Alert, AlertAction, AlertDescription, AlertTitle } from '@/shared/ui/alert';
 import { Button } from '@/shared/ui/button';
 
-import type { ImportFailure } from '../utils/utils';
+import type { ImportFailure } from '../../utils/utils';
 
 export function ImportAlert({ error, onDismiss }: { error: ImportFailure; onDismiss: () => void }) {
   return (

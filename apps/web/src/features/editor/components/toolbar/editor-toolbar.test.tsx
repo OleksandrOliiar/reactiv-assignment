@@ -8,7 +8,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { loadedConfiguration } from '@/test/fixtures';
 import { renderEditor } from '@/test/render';
 
-import { EditorScreen } from './editor-screen';
+import { EditorScreen } from '../editor-screen';
 
 const toast = vi.hoisted(() => ({ success: vi.fn(), error: vi.fn() }));
 vi.mock('sonner', () => ({ toast }));

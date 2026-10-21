@@ -4,8 +4,8 @@ import { Card } from '@/shared/ui/card';
 import { Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from '@/shared/ui/empty';
 import { ScrollArea } from '@/shared/ui/scroll-area';
 
-import { useEditorSections } from './editor-store-provider';
-import { SectionPreview } from './sections-registry';
+import { useEditorSections } from '../editor-store-provider';
+import { SectionPreview } from './registry';
 
 export function PhonePreview() {
   const sections = useEditorSections();

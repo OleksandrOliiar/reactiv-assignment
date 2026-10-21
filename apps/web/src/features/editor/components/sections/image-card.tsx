@@ -3,8 +3,8 @@ import { ChevronDown, ChevronUp, Trash2 } from 'lucide-react';
 import { Button } from '@/shared/ui/button';
 import { Card, CardAction, CardContent, CardHeader, CardTitle } from '@/shared/ui/card';
 
-import type { DraftImage, SectionErrors } from '../types/types';
-import { useEditorActions } from './editor-store-provider';
+import type { DraftImage, SectionErrors } from '../../types/types';
+import { useEditorActions } from '../editor-store-provider';
 import { UrlField } from './fields';
 
 export function ImageCard({

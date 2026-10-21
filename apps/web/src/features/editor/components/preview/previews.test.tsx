@@ -4,7 +4,7 @@ import { defaultConfigurationData } from '@reactiv/contracts';
 import { fireEvent, render, screen } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 
-import type { SectionOf } from '../types/types';
+import type { SectionOf } from '../../types/types';
 import { CtaPreview } from './cta-preview';
 import { SlideImage } from './slide-image';
 import { TextPreview } from './text-preview';

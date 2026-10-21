@@ -6,7 +6,7 @@ import { EditorStatus } from './editor-status';
 import { ImportAlert } from './import-alert';
 import { ImportExportMenu } from './import-export-menu';
 import { SaveButton } from './save-button';
-import type { ImportFailure } from '../utils/utils';
+import type { ImportFailure } from '../../utils/utils';
 
 /**
  * Phones get two rows: title and Save, then the secondary actions stretched

@@ -4,9 +4,9 @@ import { LIMITS } from '@reactiv/contracts';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/shared/ui/tabs';
 import { AddSectionMenu } from './add-section-menu';
 import { useEditorIsDirty, useEditorSections } from './editor-store-provider';
-import { EditorToolbar } from './editor-toolbar';
-import { PhonePreview } from './phone-preview';
-import { SectionList } from './section-list';
+import { EditorToolbar } from './toolbar/editor-toolbar';
+import { PhonePreview } from './preview/phone-preview';
+import { SectionList } from './sections/section-list';
 import { useUnsavedChangesWarning } from '../hooks/use-unsaved-changes-warning';
 import { PanelHeading } from './panel-heading';
 

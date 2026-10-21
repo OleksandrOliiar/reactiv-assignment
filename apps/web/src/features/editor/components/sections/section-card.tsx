@@ -8,11 +8,11 @@ import { Button } from '@/shared/ui/button';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/shared/ui/collapsible';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/shared/ui/tooltip';
 
-import type { DraftSection, SectionErrors } from '../types/types';
-import { sectionTitle } from '../utils/utils';
-import { useEditorActions, useEditorSelectedSectionId } from './editor-store-provider';
+import type { DraftSection, SectionErrors } from '../../types/types';
+import { sectionTitle } from '../../utils/utils';
+import { useEditorActions, useEditorSelectedSectionId } from '../editor-store-provider';
 import { SectionMenu } from './section-menu';
-import { SectionEditor, sectionRegistry } from './sections-registry';
+import { SectionEditor, sectionRegistry } from './registry';
 
 type SectionCardProps = {
   section: DraftSection;

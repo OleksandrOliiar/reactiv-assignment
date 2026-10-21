@@ -5,7 +5,7 @@ import {
   useEditorValidation,
   useEditorVersion,
   useEditorIsNew,
-} from './editor-store-provider';
+} from '../editor-store-provider';
 
 function statusLabel(isNew: boolean, dirty: boolean): string {
   if (dirty) return 'Unsaved changes';

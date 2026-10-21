@@ -3,7 +3,7 @@ import { Plus } from 'lucide-react';
 
 import { Button } from '@/shared/ui/button';
 
-import { useEditorActions } from './editor-store-provider';
+import { useEditorActions } from '../editor-store-provider';
 
 export function AddImageButton({
   sectionId,

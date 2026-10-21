@@ -2,8 +2,8 @@ import { ASPECT_RATIOS, type AspectRatio } from '@reactiv/contracts';
 
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/shared/ui/select';
 
-import type { SectionOf } from '../types/types';
-import { useEditorActions } from './editor-store-provider';
+import type { SectionOf } from '../../types/types';
+import { useEditorActions } from '../editor-store-provider';
 
 const ASPECT_LABELS: Record<AspectRatio, string> = {
   portrait: 'Portrait',

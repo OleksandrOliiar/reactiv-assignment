@@ -1,8 +1,7 @@
 import { configurationDataSchema, entityIdSchema, type Configuration } from '@reactiv/contracts';
 import { z } from 'zod';
 
-import type { ConfigServiceError } from '@/features/editor/api/config-service-client';
-import { detailsToFieldErrors, issuesToFieldErrors } from '@/features/editor/store/utils';
+import { issuesToFieldErrors } from '@/features/editor/store/utils';
 import type { DraftDocument, FieldErrors } from '@/features/editor/types/types';
 
 export type SaveInput = {
@@ -45,25 +44,4 @@ export function parseSaveInput(
 function draftOf(input: unknown): DraftDocument {
   const sections = (input as { data?: { sections?: unknown } } | null)?.data?.sections;
   return { sections: Array.isArray(sections) ? sections : [] };
-}
-
-/** Maps an expected API failure onto a result the browser can render. */
-export function classifySaveFailure(
-  failure: Pick<ConfigServiceError, 'code' | 'message' | 'details'>,
-  document: DraftDocument,
-): SaveResult | null {
-  switch (failure.code) {
-    case 'CONFLICT':
-      return { status: 'conflict', message: failure.message };
-    case 'NOT_FOUND':
-      return { status: 'not_found', message: failure.message };
-    case 'VALIDATION_ERROR':
-      return {
-        status: 'invalid',
-        message: failure.message,
-        errors: detailsToFieldErrors(document, failure.details ?? []),
-      };
-    default:
-      return null;
-  }
 }

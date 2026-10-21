@@ -19,6 +19,8 @@ export type CreateAppDependencies = {
 
 export function createApp({ configurationsRepository, apiKey, logger }: CreateAppDependencies) {
   const app = express();
+  // Express sets `X-Powered-By: Express` before middleware runs. Helmet strips it only
+  // for requests that reach it, so this keeps the header off every response.
   app.disable('x-powered-by');
   app.use(createRequestLogger(logger));
   app.use(helmet());

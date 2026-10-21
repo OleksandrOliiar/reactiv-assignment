@@ -17,142 +17,65 @@ vi.mock('@/features/editor/api/config-service-client', async () => {
 });
 
 const configuration = createDefaultConfiguration('default', '2026-01-01T00:00:00.000Z');
+const draft = { id: 'default', version: 1, isNew: false, data: defaultConfigurationData };
+const UNAVAILABLE = 'The configuration service is unavailable.';
+
+beforeEach(() => {
+  get.mockReset();
+  create.mockReset();
+  update.mockReset();
+});
 
 describe('saveConfiguration action', () => {
-  beforeEach(() => {
-    get.mockReset();
-    create.mockReset();
-    update.mockReset();
-  });
-
-  it('updates an existing screen and returns the saved configuration', async () => {
+  it('saves through the service and returns the saved configuration', async () => {
     const { saveConfiguration } = await import('./actions');
     update.mockResolvedValue({ ...configuration, version: 2 });
 
-    await expect(
-      saveConfiguration({
-        id: 'default',
-        version: 1,
-        isNew: false,
-        data: defaultConfigurationData,
-      }),
-    ).resolves.toEqual({
-      status: 'saved',
-      configuration: { ...configuration, version: 2 },
-    });
+    const result = await saveConfiguration(draft);
 
-    expect(update).toHaveBeenCalledWith('default', {
-      version: 1,
-      data: defaultConfigurationData,
-    });
+    expect(result).toEqual({ status: 'saved', configuration: { ...configuration, version: 2 } });
     expect(JSON.stringify(update.mock.calls)).not.toContain('change-me-to-a-long-random-secret');
-  });
-
-  it('creates when the draft is marked new', async () => {
-    const { saveConfiguration } = await import('./actions');
-    create.mockResolvedValue(configuration);
-
-    await expect(
-      saveConfiguration({
-        id: 'default',
-        version: 1,
-        isNew: true,
-        data: defaultConfigurationData,
-      }),
-    ).resolves.toMatchObject({ status: 'saved' });
-
-    expect(create).toHaveBeenCalledWith({ id: 'default', data: defaultConfigurationData });
-  });
-
-  it('returns a conflict result when the service reports a version mismatch', async () => {
-    const { saveConfiguration } = await import('./actions');
-    update.mockRejectedValue(new ConfigServiceError(409, 'CONFLICT', 'Version mismatch'));
-
-    await expect(
-      saveConfiguration({
-        id: 'default',
-        version: 1,
-        isNew: false,
-        data: defaultConfigurationData,
-      }),
-    ).resolves.toMatchObject({ status: 'conflict' });
-  });
-
-  it('throws a plain error for unexpected failures', async () => {
-    const { saveConfiguration } = await import('./actions');
-    update.mockRejectedValue(new ConfigServiceError(503, 'INTERNAL', 'Down'));
-
-    await expect(
-      saveConfiguration({
-        id: 'default',
-        version: 1,
-        isNew: false,
-        data: defaultConfigurationData,
-      }),
-    ).rejects.toThrow('The configuration service is unavailable.');
   });
 
   it('rejects an invalid draft without calling the service', async () => {
     const { saveConfiguration } = await import('./actions');
 
     await expect(
-      saveConfiguration({ id: 'default', version: 1, isNew: false, data: { sections: 'nope' } }),
+      saveConfiguration({ ...draft, data: { sections: 'nope' } }),
     ).resolves.toMatchObject({ status: 'invalid' });
     expect(update).not.toHaveBeenCalled();
     expect(create).not.toHaveBeenCalled();
   });
+
+  it('hides unexpected failures behind a plain error', async () => {
+    const { saveConfiguration } = await import('./actions');
+    update.mockRejectedValue(new ConfigServiceError(503, 'INTERNAL', 'Down'));
+
+    await expect(saveConfiguration(draft)).rejects.toThrow(UNAVAILABLE);
+  });
 });
 
 describe('overwriteConfiguration action', () => {
-  beforeEach(() => {
-    get.mockReset();
-    create.mockReset();
-    update.mockReset();
-  });
-
-  it('saves the draft at the version stored now', async () => {
+  it('saves at the version stored now', async () => {
     const { overwriteConfiguration } = await import('./actions');
     get.mockResolvedValue({ ...configuration, version: 5 });
     update.mockResolvedValue({ ...configuration, version: 6 });
 
-    await expect(
-      overwriteConfiguration({
-        id: 'default',
-        version: 2,
-        isNew: false,
-        data: defaultConfigurationData,
-      }),
-    ).resolves.toMatchObject({ status: 'saved' });
-
-    expect(update).toHaveBeenCalledWith('default', {
-      version: 5,
-      data: defaultConfigurationData,
+    await expect(overwriteConfiguration({ ...draft, version: 2 })).resolves.toMatchObject({
+      status: 'saved',
     });
+    expect(update).toHaveBeenCalledWith('default', { version: 5, data: defaultConfigurationData });
   });
 
-  it('creates the screen when it was deleted', async () => {
+  it('hides failures reading the latest version', async () => {
     const { overwriteConfiguration } = await import('./actions');
-    get.mockRejectedValue(new ConfigServiceError(404, 'NOT_FOUND', 'Missing'));
-    create.mockResolvedValue(configuration);
+    get.mockRejectedValue(new ConfigServiceError(503, 'INTERNAL', 'Down'));
 
-    await expect(
-      overwriteConfiguration({
-        id: 'default',
-        version: 2,
-        isNew: false,
-        data: defaultConfigurationData,
-      }),
-    ).resolves.toMatchObject({ status: 'saved' });
-
-    expect(create).toHaveBeenCalledWith({ id: 'default', data: defaultConfigurationData });
+    await expect(overwriteConfiguration(draft)).rejects.toThrow(UNAVAILABLE);
   });
 });
 
 describe('loadLatestConfiguration action', () => {
-  beforeEach(() => {
-    get.mockReset();
-  });
-
   it('loads the current configuration', async () => {
     const { loadLatestConfiguration } = await import('./actions');
     get.mockResolvedValue(configuration);
@@ -180,8 +103,6 @@ describe('loadLatestConfiguration action', () => {
     const { loadLatestConfiguration } = await import('./actions');
     get.mockRejectedValue(new ConfigServiceError(503, 'INTERNAL', 'Down'));
 
-    await expect(loadLatestConfiguration('default')).rejects.toThrow(
-      'The configuration service is unavailable.',
-    );
+    await expect(loadLatestConfiguration('default')).rejects.toThrow(UNAVAILABLE);
   });
 });

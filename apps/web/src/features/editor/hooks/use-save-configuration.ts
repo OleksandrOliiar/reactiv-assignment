@@ -6,7 +6,7 @@ import {
   overwriteConfiguration,
   saveConfiguration,
 } from '@/features/editor/api/actions';
-import type { SaveResult } from '@/features/editor/api/save-configuration';
+import type { SaveResult } from '@/features/editor/api/utils';
 import {
   useEditorActions,
   useEditorHasErrors,

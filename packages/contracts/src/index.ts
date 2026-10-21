@@ -47,12 +47,6 @@ export type {
 export { ERROR_CODES, errorCodeSchema, errorDetailSchema, errorResponseSchema } from './errors';
 export type { ErrorCode, ErrorDetail, ErrorResponse } from './errors';
 
-export {
-  UnsupportedSchemaVersionError,
-  configurationMigrations,
-  migrateConfigurationData,
-  runMigrations,
-} from './migrations';
-export type { MigrationStep } from './migrations';
+export { UnsupportedSchemaVersionError, migrateConfigurationData } from './migrations';
 
 export { createDefaultConfiguration, defaultConfigurationData } from './defaults';

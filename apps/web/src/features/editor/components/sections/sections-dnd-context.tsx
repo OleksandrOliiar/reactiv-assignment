@@ -43,7 +43,7 @@ export function SectionsDndContext({
   sections: DraftSection[];
   children: ReactNode;
 }) {
-  const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 4 } }));
+  const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 0 } }));
   const { reorderSection } = useEditorActions();
 
   function handleDragEnd({ active, over }: DragEndEvent) {

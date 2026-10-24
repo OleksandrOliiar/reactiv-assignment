@@ -148,9 +148,6 @@ export function createEditorStore({
               state.isNew = false;
               state.document = document;
               state.savedDocument = document;
-              if (!document.sections.some(({ id }) => id === state.selectedSectionId)) {
-                state.selectedSectionId = firstSectionId(document);
-              }
             });
           },
           discardChanges() {

@@ -53,7 +53,8 @@ export function SectionCard({ section, index, count, errors }: SectionCardProps)
     <Collapsible
       ref={setNodeRef}
       style={{
-        transform: CSS.Transform.toString(transform),
+        // The drag transform also scales this card to the one under the pointer.
+        transform: CSS.Translate.toString(transform),
         transition,
       }}
       className={cn(

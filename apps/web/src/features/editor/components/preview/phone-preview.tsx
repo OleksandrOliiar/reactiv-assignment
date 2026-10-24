@@ -5,7 +5,7 @@ import { Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from '@/
 import { ScrollArea } from '@/shared/ui/scroll-area';
 
 import { useEditorSections } from '../editor-store-provider';
-import { SectionPreview } from './registry';
+import { SectionPreview } from './preview-registry';
 
 export function PhonePreview() {
   const sections = useEditorSections();

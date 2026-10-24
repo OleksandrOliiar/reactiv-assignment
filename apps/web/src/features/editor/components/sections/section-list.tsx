@@ -1,24 +1,11 @@
-import {
-  closestCenter,
-  DndContext,
-  PointerSensor,
-  useSensor,
-  useSensors,
-  type Announcements,
-  type DragEndEvent,
-  type UniqueIdentifier,
-} from '@dnd-kit/core';
 import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import { LayoutList } from 'lucide-react';
 
 import { Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from '@/shared/ui/empty';
 
-import { sectionTitle } from '../../utils/utils';
-import { useEditorActions, useEditorSections, useEditorValidation } from '../editor-store-provider';
+import { useEditorSections, useEditorValidation } from '../editor-store-provider';
 import { SectionCard } from './section-card';
-
-const SCREEN_READER_INSTRUCTIONS =
-  'Press the up or down arrow key to move this section, or drag it with a pointer.';
+import { SectionsDndContext } from './sections-dnd-context';
 
 /**
  * Pointer dragging only. The handle moves one position per arrow key through
@@ -26,45 +13,14 @@ const SCREEN_READER_INSTRUCTIONS =
  */
 export function SectionList() {
   const sections = useEditorSections();
-  const { reorderSection } = useEditorActions();
   const errors = useEditorValidation();
-  const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 4 } }));
-
-  function titleOf(id: UniqueIdentifier | undefined): string {
-    const section = sections.find((candidate) => candidate.id === id);
-    return section ? sectionTitle(section) : 'section';
-  }
-
-  const announcements: Announcements = {
-    onDragStart: ({ active }) => `Picked up ${titleOf(active.id)}.`,
-    onDragOver: ({ active, over }) =>
-      over ? `${titleOf(active.id)} is over ${titleOf(over.id)}.` : undefined,
-    onDragEnd: ({ active, over }) =>
-      over
-        ? `${titleOf(active.id)} was dropped at the position of ${titleOf(over.id)}.`
-        : undefined,
-    onDragCancel: ({ active }) => `Moving ${titleOf(active.id)} was cancelled.`,
-  };
-
-  function handleDragEnd({ active, over }: DragEndEvent) {
-    if (over && active.id !== over.id) reorderSection(String(active.id), String(over.id));
-  }
 
   if (sections.length === 0) {
     return <NoSectionsMessage />;
   }
 
   return (
-    <DndContext
-      id="sections"
-      sensors={sensors}
-      collisionDetection={closestCenter}
-      accessibility={{
-        announcements,
-        screenReaderInstructions: { draggable: SCREEN_READER_INSTRUCTIONS },
-      }}
-      onDragEnd={handleDragEnd}
-    >
+    <SectionsDndContext sections={sections}>
       <SortableContext
         items={sections.map((section) => section.id)}
         strategy={verticalListSortingStrategy}
@@ -81,7 +37,7 @@ export function SectionList() {
           ))}
         </div>
       </SortableContext>
-    </DndContext>
+    </SectionsDndContext>
   );
 }
 

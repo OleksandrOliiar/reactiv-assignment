@@ -2,7 +2,9 @@ import { LIMITS } from '@reactiv/contracts';
 
 import type { SectionErrors, SectionOf } from '../../types/types';
 import { useEditorActions } from '../editor-store-provider';
-import { ColorField, TextField, UrlField } from './fields';
+import { ColorField } from './color-field';
+import { UrlField } from './url-field';
+import { TextField } from './text-field';
 
 export function CtaEditor({
   section,

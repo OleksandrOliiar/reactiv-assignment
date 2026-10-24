@@ -1,6 +1,5 @@
 import { Download, FileJson, Upload } from 'lucide-react';
 import { useRef, type ChangeEvent } from 'react';
-import { toast } from 'sonner';
 
 import { Button } from '@/shared/ui/button';
 import {
@@ -10,13 +9,10 @@ import {
   DropdownMenuTrigger,
 } from '@/shared/ui/dropdown-menu';
 
-import { useEditorActions, useEditorHasErrors, useEditorStoreApi } from '../editor-store-provider';
-import {
-  createExportFile,
-  downloadExport,
-  readImportFile,
-  type ImportFailure,
-} from '../../utils/utils';
+import { useExportDraft } from '../../hooks/use-export-draft';
+import { useImportFile } from '../../hooks/use-import-file';
+import { type ImportFailure } from '../../utils/utils';
+import { useEditorHasErrors } from '../editor-store-provider';
 
 /** `onImportError` receives null after a successful import. */
 export function ImportExportMenu({
@@ -24,28 +20,12 @@ export function ImportExportMenu({
 }: {
   onImportError: (error: ImportFailure | null) => void;
 }) {
-  const store = useEditorStoreApi();
-  const { replaceDocument } = useEditorActions();
   const hasErrors = useEditorHasErrors();
+
+  const exportDraft = useExportDraft();
+  const importFile = useImportFile({ onImportError });
+
   const fileInput = useRef<HTMLInputElement>(null);
-
-  function exportDraft() {
-    const file = createExportFile(store.getState().state.document);
-    if (!file) return;
-    downloadExport(file);
-    toast.success('Exported the home screen');
-  }
-
-  async function importFile(file: File) {
-    const result = await readImportFile(file);
-    if (!result.ok) {
-      onImportError(result.error);
-      return;
-    }
-    replaceDocument(result.data);
-    onImportError(null);
-    toast.success('Imported the home screen. Save to keep it.');
-  }
 
   function handleInputChange(event: ChangeEvent<HTMLInputElement>) {
     const file = event.currentTarget.files?.[0];

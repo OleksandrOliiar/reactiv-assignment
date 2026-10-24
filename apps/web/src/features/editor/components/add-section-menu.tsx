@@ -1,4 +1,3 @@
-import { LIMITS } from '@reactiv/contracts';
 import { Plus } from 'lucide-react';
 
 import { Button } from '@/shared/ui/button';
@@ -8,12 +7,12 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/shared/ui/dropdown-menu';
-import { useEditorActions, useEditorSections } from './editor-store-provider';
-import { sectionRegistry } from './sections/registry';
+import { useEditorActions, useSectionsAtLimit } from './editor-store-provider';
+import { sectionRegistry } from './sections/sections-registry';
 
 export function AddSectionMenu() {
   const { addSection } = useEditorActions();
-  const atLimit = useEditorSections().length >= LIMITS.sections;
+  const atLimit = useSectionsAtLimit();
 
   return (
     <DropdownMenu>

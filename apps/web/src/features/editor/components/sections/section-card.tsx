@@ -12,7 +12,7 @@ import type { DraftSection, SectionErrors } from '../../types/types';
 import { sectionTitle } from '../../utils/utils';
 import { useEditorActions, useEditorSelectedSectionId } from '../editor-store-provider';
 import { SectionMenu } from './section-menu';
-import { SectionEditor, sectionRegistry } from './registry';
+import { SectionEditor, sectionRegistry } from './sections-registry';
 
 type SectionCardProps = {
   section: DraftSection;

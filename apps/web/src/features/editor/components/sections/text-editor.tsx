@@ -2,7 +2,8 @@ import { LIMITS, type TextBlock } from '@reactiv/contracts';
 
 import type { SectionErrors, SectionOf } from '../../types/types';
 import { useEditorActions } from '../editor-store-provider';
-import { ColorField, TextField } from './fields';
+import { ColorField } from './color-field';
+import { TextField } from './text-field';
 
 export function TextEditor({
   section,

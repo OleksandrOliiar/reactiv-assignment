@@ -16,6 +16,7 @@ import {
 } from '../store/selectors';
 import { createEditorStore, type EditorStoreApi } from '../store/store';
 import type { EditorStore } from '../store/types';
+import { LIMITS } from '@reactiv/contracts';
 
 const EditorStoreContext = createContext<EditorStoreApi | null>(null);
 
@@ -72,4 +73,8 @@ export function useEditorSelectedSectionId() {
 
 export function useEditorSections() {
   return useEditorStore(selectSections);
+}
+
+export function useSectionsAtLimit() {
+  return useEditorSections().length >= LIMITS.sections;
 }

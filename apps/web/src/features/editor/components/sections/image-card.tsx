@@ -5,7 +5,7 @@ import { Card, CardAction, CardContent, CardHeader, CardTitle } from '@/shared/u
 
 import type { DraftImage, SectionErrors } from '../../types/types';
 import { useEditorActions } from '../editor-store-provider';
-import { UrlField } from './fields';
+import { UrlField } from './url-field';
 
 export function ImageCard({
   index,

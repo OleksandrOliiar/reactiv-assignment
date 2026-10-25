@@ -4,7 +4,7 @@ A small editor for a mobile app home screen. The page shows the sections beside 
 
 The screen is one document made of three section types: an image carousel, a text block, and a call-to-action button. Sections can be added, reordered, and removed.
 
-<img width="565" height="435" alt="image" src="https://github.com/user-attachments/assets/f782adbf-c675-4d59-933c-fb16d3da10bf" />
+<img width="418" height="335" alt="image" src="https://github.com/user-attachments/assets/6f8eef01-bad6-4fbb-9805-8785b2a5a8d0" />
 
 ## Architecture
 

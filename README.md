@@ -13,22 +13,24 @@ The browser never sees the API key. Next.js loads and saves on the server, and o
 ```mermaid
 flowchart LR
   Browser["Browser: editor and Zustand draft"]
-  subgraph webApp [apps/web Next.js]
-    Page[Server Component]
-    Actions[Server Actions]
+  subgraph webApp ["apps/web Next.js"]
+    Page["Server Component"]
+    Actions["Server Actions"]
     Client["Axios client, holds the API key"]
   end
-  subgraph apiApp [apps/api Express]
-    Auth[API key check]
-    Service[configurations service]
+  subgraph apiApp ["apps/api Express"]
+    Auth["API key check"]
+    Service["configurations service"]
   end
-  DB[(Postgres jsonb)]
-  Contracts[packages/contracts]
+  DB[("Postgres jsonb")]
+  Contracts["packages/contracts"]
   Browser --> Page
   Browser --> Actions
   Page --> Client
   Actions --> Client
-  Client -->|"x-api-key, /v1"| Auth --> Service --> DB
+  Client -->|"x-api-key, /v1"| Auth
+  Auth --> Service
+  Service --> DB
   Contracts -.-> webApp
   Contracts -.-> apiApp
 ```

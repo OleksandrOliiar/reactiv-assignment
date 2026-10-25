@@ -1,18 +1,18 @@
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { ChevronDown, GripVertical } from 'lucide-react';
+import { ChevronDown } from 'lucide-react';
 
 import { cn } from '@/shared/lib/utils';
 import { Badge } from '@/shared/ui/badge';
 import { Button } from '@/shared/ui/button';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/shared/ui/collapsible';
-import { Tooltip, TooltipContent, TooltipTrigger } from '@/shared/ui/tooltip';
 
 import type { DraftSection, SectionErrors } from '../../types/types';
 import { sectionTitle } from '../../utils/utils';
 import { useEditorActions, useEditorSelectedSectionId } from '../editor-store-provider';
 import { SectionMenu } from './section-menu';
 import { SectionEditor, sectionRegistry } from './sections-registry';
+import { DragSectionButton } from './drag-section-button';
 
 type SectionCardProps = {
   section: DraftSection;
@@ -23,26 +23,9 @@ type SectionCardProps = {
 
 export function SectionCard({ section, index, count, errors }: SectionCardProps) {
   const selected = useEditorSelectedSectionId() === section.id;
-  const { moveSection, selectSection } = useEditorActions();
-  const {
-    attributes,
-    listeners,
-    setNodeRef,
-    setActivatorNodeRef,
-    transform,
-    transition,
-    isDragging,
-  } = useSortable({ id: section.id });
+  const { selectSection } = useEditorActions();
 
-  /** Arrow keys move through the store; see `SectionList` for why dnd-kit's keyboard sensor is off. */
-  function handleKeyDown(event: React.KeyboardEvent<HTMLButtonElement>) {
-    if (event.key !== 'ArrowUp' && event.key !== 'ArrowDown') {
-      return;
-    }
-
-    event.preventDefault();
-    moveSection(section.id, event.key === 'ArrowUp' ? 'up' : 'down');
-  }
+  const { setNodeRef, transform, transition, isDragging } = useSortable({ id: section.id });
 
   const definition = sectionRegistry[section.type];
   const Icon = definition.icon;
@@ -109,26 +92,7 @@ export function SectionCard({ section, index, count, errors }: SectionCardProps)
             />
           </Button>
         </CollapsibleTrigger>
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <Button
-              ref={setActivatorNodeRef}
-              type="button"
-              variant="ghost"
-              size="icon-sm"
-              className="relative z-10 shrink-0 cursor-grab touch-none text-muted-foreground hover:text-foreground active:cursor-grabbing"
-              {...attributes}
-              {...listeners}
-              aria-label={`Reorder ${title}`}
-              aria-roledescription="sortable"
-              onKeyDown={handleKeyDown}
-            >
-              <GripVertical />
-            </Button>
-          </TooltipTrigger>
-
-          <TooltipContent>Drag, or focus and press the up or down arrow key</TooltipContent>
-        </Tooltip>
+        <DragSectionButton sectionId={section.id} title={title} />
         <div className="relative z-10 ml-auto shrink-0">
           <SectionMenu sectionId={section.id} title={title} index={index} count={count} />
         </div>

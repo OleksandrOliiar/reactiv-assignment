@@ -31,14 +31,14 @@ export function EditorStatus() {
       <span
         className={cn(
           'inline-flex items-center gap-1.5 font-medium',
-          dirty ? 'text-amber-700' : isNew ? 'text-foreground' : 'text-emerald-700',
+          dirty ? 'text-amber-300' : isNew ? 'text-foreground' : 'text-primary',
         )}
       >
         <span
           aria-hidden
           className={cn(
             'size-1.5 rounded-full',
-            dirty ? 'bg-amber-500' : isNew ? 'bg-muted-foreground' : 'bg-emerald-500',
+            dirty ? 'bg-amber-300' : isNew ? 'bg-muted-foreground' : 'bg-primary',
           )}
         />
         <span>{statusLabel(isNew, dirty)}</span>
@@ -48,7 +48,7 @@ export function EditorStatus() {
           <span aria-hidden className="text-border">
             |
           </span>
-          <span className="tabular-nums">Version {version}</span>
+          <span className="font-mono tracking-wider uppercase tabular-nums">Version {version}</span>
         </>
       )}
       {errorCount > 0 ? (

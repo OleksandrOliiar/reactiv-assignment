@@ -17,10 +17,12 @@ export function PanelHeading({
   return (
     <div className={cn('flex items-center justify-between gap-4', className)}>
       <div className="flex min-w-0 flex-col gap-1">
-        <h2 className="flex items-baseline gap-2 text-base font-semibold tracking-tight">
+        <h2 className="flex items-baseline gap-2.5 text-lg font-normal tracking-tight">
           {title}{' '}
           {meta ? (
-            <span className="text-xs font-normal text-muted-foreground tabular-nums">{meta}</span>
+            <span className="font-mono text-xs tracking-wider text-primary uppercase tabular-nums">
+              {meta}
+            </span>
           ) : null}
         </h2>
         <p className="text-sm text-muted-foreground">{description}</p>

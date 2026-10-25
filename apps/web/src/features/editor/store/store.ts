@@ -2,11 +2,7 @@ import { current } from 'immer';
 import { createStore, type StateCreator } from 'zustand/vanilla';
 import { immer } from 'zustand/middleware/immer';
 
-import type {
-  DraftDocument,
-  FieldErrors,
-  LoadedConfiguration,
-} from '@/features/editor/types/types';
+import type { FieldErrors, LoadedConfiguration } from '@/features/editor/types/types';
 import type { EditorState, EditorStore } from '@/features/editor/store/types';
 import {
   createSection,
@@ -16,10 +12,6 @@ import {
 } from '@/features/editor/store/utils';
 
 const NO_ERRORS: FieldErrors = {};
-
-function firstSectionId(document: DraftDocument): string | null {
-  return document.sections[0]?.id ?? null;
-}
 
 type CreateEditorStoreOptions = {
   initial: LoadedConfiguration;
@@ -49,7 +41,7 @@ export function createEditorStore({
           isNew: initial.isNew,
           document,
           savedDocument: document,
-          selectedSectionId: firstSectionId(document),
+          selectedSectionId: null,
           serverErrors: NO_ERRORS,
         },
         actions: {
@@ -77,9 +69,6 @@ export function createEditorStore({
               const index = sections.findIndex((section) => section.id === id);
               if (index < 0) return;
               sections.splice(index, 1);
-              if (state.selectedSectionId === id) {
-                state.selectedSectionId = firstSectionId(state.document);
-              }
             });
           },
           moveSection(id, direction) {
@@ -137,7 +126,6 @@ export function createEditorStore({
           replaceDocument(document) {
             edit((state) => {
               state.document = document;
-              state.selectedSectionId = firstSectionId(document);
             });
           },
           markSaved(configuration) {

@@ -18,14 +18,14 @@ export function CtaPreview({ section }: { section: SectionOf<'cta'> }) {
   return (
     <div className="flex flex-col gap-2">
       {httpUrlSchema.safeParse(section.url).success ? (
-        <Button asChild style={style} className="h-11 w-full rounded-xl shadow-sm">
+        <Button asChild size="cta" style={style}>
           <a href={section.url} target="_blank" rel="noopener noreferrer">
             {label}
           </a>
         </Button>
       ) : (
         <>
-          <Button type="button" style={style} className="h-11 w-full rounded-xl shadow-sm">
+          <Button type="button" size="cta" style={style}>
             {label}
           </Button>
           <Alert className="text-xs">

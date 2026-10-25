@@ -36,9 +36,6 @@ describe('editor store', () => {
     const editor = store();
     expect(editor.getState().state.id).toBe('default');
     expect(editor.getState().state.version).toBe(3);
-    expect(editor.getState().state.selectedSectionId).toBe(
-      defaultConfigurationData.sections[0]?.id,
-    );
     expect(selectIsDirty(editor.getState())).toBe(false);
     expect(selectValidation(editor.getState())).toEqual({});
   });
@@ -125,18 +122,15 @@ describe('editor store', () => {
     expect(selectIsDirty(editor.getState())).toBe(false);
   });
 
-  it('keeps the open section across a save, or opens the first one if it is gone', () => {
+  it('leaves the open section as it is when saving', () => {
     const editor = store();
     editor.getState().actions.selectSection('welcome-cta');
     editor.getState().actions.markSaved({ ...configuration, version: 4 });
     expect(editor.getState().state.selectedSectionId).toBe('welcome-cta');
 
-    editor.getState().actions.markSaved({
-      ...configuration,
-      version: 5,
-      data: { sections: defaultConfigurationData.sections.slice(0, 2) },
-    });
-    expect(editor.getState().state.selectedSectionId).toBe('welcome-carousel');
+    editor.getState().actions.selectSection(null);
+    editor.getState().actions.markSaved({ ...configuration, version: 5 });
+    expect(editor.getState().state.selectedSectionId).toBeNull();
   });
 
   it('is not dirty when an edit is typed back to the saved value', () => {
@@ -157,17 +151,6 @@ describe('editor store', () => {
     if (copy?.type !== 'carousel') return;
     expect(copy.images.map((image) => image.id)).toEqual(['id-2', 'id-3']);
     expect(selectValidation(editor.getState())).toEqual({});
-  });
-
-  it('opens the first remaining section when the open one is removed', () => {
-    const editor = store();
-    editor.getState().actions.selectSection('welcome-text');
-    editor.getState().actions.removeSection('welcome-text');
-    expect(editor.getState().state.selectedSectionId).toBe('welcome-carousel');
-
-    editor.getState().actions.selectSection('welcome-cta');
-    editor.getState().actions.removeSection('welcome-carousel');
-    expect(editor.getState().state.selectedSectionId).toBe('welcome-cta');
   });
 
   it('adds, edits, moves, and removes carousel images', () => {
@@ -209,7 +192,6 @@ describe('editor store', () => {
     editor.getState().actions.replaceDocument(imported);
 
     expect(editor.getState().state.document).toEqual(imported);
-    expect(editor.getState().state.selectedSectionId).toBe('welcome-cta');
     expect(selectIsDirty(editor.getState())).toBe(true);
   });
 

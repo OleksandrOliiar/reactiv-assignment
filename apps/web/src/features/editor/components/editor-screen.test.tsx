@@ -68,6 +68,7 @@ describe('EditorScreen', () => {
         .getAllByRole('textbox', { name: 'Image URL' })
         .map((input) => (input as HTMLInputElement).value);
 
+    await user.click(screen.getByRole('button', { name: /^1\.\s*Carousel, 2 images/ }));
     await user.click(screen.getByRole('button', { name: 'Add image' }));
     expect(urls()).toHaveLength(3);
     expect(screen.getByRole('button', { name: /^1\.\s*Carousel, 3 images/ })).toBeInTheDocument();
@@ -84,6 +85,7 @@ describe('EditorScreen', () => {
   });
 
   it('stops adding images at the carousel limit', async () => {
+    const user = userEvent.setup();
     const [carousel] = defaultConfigurationData.sections;
     if (carousel?.type !== 'carousel') throw new Error('expected the carousel first');
     const images = Array.from({ length: LIMITS.imagesPerCarousel }, (_, index) => ({
@@ -92,6 +94,11 @@ describe('EditorScreen', () => {
     }));
     renderEditor(<EditorScreen />, { initial: loadedWith([{ ...carousel, images }]) });
 
+    await user.click(
+      screen.getByRole('button', {
+        name: new RegExp(`^1\\.\\s*Carousel, ${LIMITS.imagesPerCarousel} images`),
+      }),
+    );
     expect(screen.getByRole('button', { name: 'Add image' })).toBeDisabled();
   });
 

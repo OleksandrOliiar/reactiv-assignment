@@ -31,7 +31,7 @@ export function CarouselEditor({
           className="mb-3 flex w-full items-center justify-between gap-2"
         >
           Images
-          <span className="text-xs font-normal text-muted-foreground tabular-nums">
+          <span className="font-mono text-xs font-normal tracking-wider text-muted-foreground uppercase tabular-nums">
             {section.images.length} of {LIMITS.imagesPerCarousel}
           </span>
         </FieldLegend>

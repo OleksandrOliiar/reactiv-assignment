@@ -20,7 +20,7 @@ export default function HomeLoading() {
           <Skeleton className="h-16 w-full rounded-xl" />
           <Skeleton className="h-16 w-full rounded-xl" />
         </div>
-        <Skeleton className="mx-auto hidden aspect-9/19 w-full max-w-84 rounded-[3rem] lg:block" />
+        <div className="mx-auto hidden aspect-9/19 w-full max-w-84 animate-pulse rounded-phone bg-muted lg:block" />
       </div>
     </div>
   );

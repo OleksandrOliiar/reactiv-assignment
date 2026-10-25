@@ -59,7 +59,6 @@ export function SectionCard({ section, index, count, errors }: SectionCardProps)
       }}
       className={cn(
         'group rounded-xl border bg-card shadow-xs transition-[border-color,box-shadow]',
-        selected ? 'border-primary/30 shadow-sm' : 'hover:border-primary/25 hover:shadow-sm',
         errorCount > 0 && !selected && 'border-destructive/40',
         isDragging && 'relative z-10 opacity-90 shadow-lg',
       )}
@@ -74,7 +73,7 @@ export function SectionCard({ section, index, count, errors }: SectionCardProps)
             type="button"
             variant="ghost"
             className={cn(
-              'absolute inset-0 z-0 h-full w-full min-w-0 justify-start gap-3 pr-12 pl-11 text-left hover:bg-accent/50 aria-expanded:bg-accent/40 active:not-aria-[haspopup]:translate-y-0',
+              'absolute inset-0 z-0 h-full w-full min-w-0 justify-start gap-3 pr-12 pl-11 text-left text-sm tracking-normal normal-case hover:bg-accent aria-expanded:bg-accent active:not-aria-[haspopup]:translate-y-0',
               selected ? 'rounded-t-xl rounded-b-none' : 'rounded-xl',
             )}
           >
@@ -93,7 +92,9 @@ export function SectionCard({ section, index, count, errors }: SectionCardProps)
                 <span className="text-muted-foreground tabular-nums">{`${index + 1}.`}</span>{' '}
                 {title}
               </span>{' '}
-              <span className="text-xs font-normal text-muted-foreground">{definition.label}</span>
+              <span className="font-mono text-[11px] font-normal tracking-wider text-muted-foreground uppercase">
+                {definition.label}
+              </span>
             </span>
             {errorCount > 0 && (
               <Badge variant="destructive" className="shrink-0">
@@ -132,8 +133,10 @@ export function SectionCard({ section, index, count, errors }: SectionCardProps)
           <SectionMenu sectionId={section.id} title={title} index={index} count={count} />
         </div>
       </div>
-      <CollapsibleContent className="border-t px-4 py-5 sm:px-5">
-        <SectionEditor section={section} errors={errors} />
+      <CollapsibleContent className="overflow-hidden border-t data-[state=closed]:animate-collapsible-up data-[state=open]:animate-collapsible-down">
+        <div className="px-4 py-5 sm:px-5">
+          <SectionEditor section={section} errors={errors} />
+        </div>
       </CollapsibleContent>
     </Collapsible>
   );

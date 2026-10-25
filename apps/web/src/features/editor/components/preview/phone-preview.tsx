@@ -1,6 +1,5 @@
 import { BatteryFull, Signal, Smartphone, Wifi } from 'lucide-react';
 
-import { Card } from '@/shared/ui/card';
 import { Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from '@/shared/ui/empty';
 import { ScrollArea } from '@/shared/ui/scroll-area';
 
@@ -11,12 +10,12 @@ export function PhonePreview() {
   const sections = useEditorSections();
 
   return (
-    <Card
+    <div
       role="region"
       aria-label="Phone preview"
-      className="mx-auto aspect-9/19 w-full max-w-84 gap-0 rounded-[3rem] bg-neutral-900 p-2.5 shadow-2xl shadow-neutral-900/25 ring-1 ring-neutral-950"
+      className="mx-auto flex aspect-9/19 w-full max-w-84 flex-col overflow-hidden rounded-phone bg-muted p-2.5 shadow-2xl shadow-background/60 ring-1 ring-foreground/25"
     >
-      <div className="relative flex min-h-0 flex-1 flex-col overflow-hidden rounded-[2.4rem] bg-background">
+      <div className="light relative flex min-h-0 flex-1 flex-col overflow-hidden rounded-[calc(var(--radius-phone)-var(--spacing)*2.5)] bg-background text-foreground">
         <StatusBar />
         <ScrollArea className="min-h-0 flex-1">
           <div className="flex flex-col gap-4 px-4 pt-2 pb-10">
@@ -32,7 +31,7 @@ export function PhonePreview() {
           className="absolute bottom-2 left-1/2 h-1 w-28 -translate-x-1/2 rounded-full bg-foreground/70"
         />
       </div>
-    </Card>
+    </div>
   );
 }
 
@@ -43,7 +42,7 @@ function StatusBar() {
       className="relative flex h-11 shrink-0 items-center justify-between px-7 text-xs font-semibold"
     >
       <span className="tabular-nums">9:41</span>
-      <span className="absolute top-2.5 left-1/2 h-6 w-24 -translate-x-1/2 rounded-full bg-neutral-900" />
+      <span className="absolute top-2.5 left-1/2 h-6 w-24 -translate-x-1/2 rounded-full bg-foreground" />
       <span className="flex items-center gap-1">
         <Signal className="size-3.5" />
         <Wifi className="size-3.5" />

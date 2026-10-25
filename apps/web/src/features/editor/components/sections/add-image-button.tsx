@@ -17,8 +17,6 @@ export function AddImageButton({
   return (
     <Button
       type="button"
-      variant="outline"
-      className="h-9 w-full border-dashed text-muted-foreground hover:border-primary/40 hover:text-foreground"
       disabled={imageCount >= LIMITS.imagesPerCarousel}
       onClick={() => addImage(sectionId)}
     >

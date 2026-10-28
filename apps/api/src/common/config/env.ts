@@ -19,7 +19,17 @@ export const envSchema = z.object({
 
 export type Env = z.infer<typeof envSchema>;
 
-export function loadEnv(source: NodeJS.ProcessEnv = process.env): Env {
+/** Load the package `.env`, then the repo root `.env`. Existing variables stay as they are. */
+export function loadDotEnvFile(): void {
+  for (const file of [
+    path.resolve(process.cwd(), '.env'),
+    path.resolve(process.cwd(), '..', '..', '.env'),
+  ]) {
+    if (existsSync(file)) process.loadEnvFile(file);
+  }
+}
+
+export function validateEnv(source: NodeJS.ProcessEnv = process.env): Env {
   const parsed = envSchema.safeParse(source);
   if (!parsed.success) {
     const lines = parsed.error.issues.map(
@@ -35,19 +45,9 @@ export function loadEnvOrExit(): Env {
   loadDotEnvFile();
 
   try {
-    return loadEnv();
+    return validateEnv();
   } catch (error) {
     console.error(error instanceof Error ? error.message : error);
     process.exit(1);
-  }
-}
-
-/** Load the package `.env`, then the repo root `.env`. Existing variables stay as they are. */
-export function loadDotEnvFile(): void {
-  for (const file of [
-    path.resolve(process.cwd(), '.env'),
-    path.resolve(process.cwd(), '..', '..', '.env'),
-  ]) {
-    if (existsSync(file)) process.loadEnvFile(file);
   }
 }
